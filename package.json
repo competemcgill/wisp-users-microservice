@@ -1,0 +1,19 @@
+{
+  "name": "wisp-users-microservice",
+  "version": "0.0.0",
+  "description": "WISP Microservice to handle user data and interactions",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Compete-McGill/wisp-users-microservice.git"
+  },
+  "author": "Valerian Clerc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Compete-McGill/wisp-users-microservice/issues"
+  },
+  "homepage": "https://github.com/Compete-McGill/wisp-users-microservice#readme"
+}
