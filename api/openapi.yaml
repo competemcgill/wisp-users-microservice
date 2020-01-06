@@ -86,10 +86,43 @@ components:
           type: string
         username:
           type: string
+        role:
+          type: string
+          example: "admin | user"
+        info:
+          type: object
+          properties:
+            major:
+              type: string
+            year:
+              type: string
+            school:
+              type: string
+            bio:
+              type: string
+            profilePhoto:
+              type: string
+              example: link to S3 bucket
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        problems:
+          type: array
+          items:
+            $ref: "#/components/schemas/Problem"
+              
     Users:
       type: array
       items:
         $ref: "#/components/schemas/User"
+    Problem:
+      type: object
+      properties:
+        problemId:
+          type: string
+        isComplete:
+          type: boolean
     Error:
       type: object
       required:
