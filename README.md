@@ -1,5 +1,11 @@
 # WISP Users Microservice
 
+## Running Server:
+
+For development:
+* `npm install`
+* `npm run dev`
+
 ## Viewing OpenAPI spec:
 
 ```bash
