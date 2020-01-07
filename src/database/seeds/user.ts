@@ -3,7 +3,6 @@ import { IProblem } from "../../interfaces/IProblem";
 
 export const sampleUsers: IUser[] = [
     {
-        id: "test mongo ID",
         username: "myUser",
         email: "user@mysite.com",
         role: "admin",
@@ -29,7 +28,6 @@ export const sampleUsers: IUser[] = [
         ]
     },
     {
-        id: "test mongo ID2",
         username: "myUser2",
         email: "user2@mysite.com",
         role: "user",

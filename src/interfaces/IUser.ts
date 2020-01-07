@@ -1,7 +1,6 @@
-import { IProblem } from './IProblem'
+import { IProblem } from "./IProblem";
 
 export interface IUser {
-    id: string;
     username: string;
     email: string;
     role: string;

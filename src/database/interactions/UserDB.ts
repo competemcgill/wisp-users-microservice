@@ -1,11 +1,11 @@
 import { IUser } from "../../interfaces/IUser";
-import { User, IUserModel } from "../models/user";
+import { IUserModel, User } from "../models/user";
 
 export const createUser = (user: IUser): Promise<IUserModel> => {
     return User.create(user);
 };
 
-export const getUsers = (): Promise<IUserModel> => {
+export const getUsers = (): Promise<IUserModel[]> => {
     return User.find().exec();
 };
 

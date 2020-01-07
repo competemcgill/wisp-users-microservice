@@ -1,5 +1,5 @@
+import { Document, Model, model, Schema } from "mongoose";
 import { IUser } from "../../interfaces/IUser";
-import { Schema, Document, Model, model } from "mongoose";
 
 export interface IUserModel extends IUser, Document { }
 
@@ -19,8 +19,6 @@ const userSchema: Schema = new Schema({
         bio: String,
         profilePhoto: String
     },
-    createdAt: String,
-    updatedAt: String,
     problems: [{
         problemId: {
             type: Schema.Types.ObjectId,
@@ -28,16 +26,11 @@ const userSchema: Schema = new Schema({
         },
         isComplete: Boolean
     }]
-});
-
-userSchema.pre("save", (next) => {
-    let now = new Date()
-    if (!this.createdAt) {
-        this.createdAt = now
+},
+    {
+        timestamps: true
     }
-    this.updatedAt = now
-    next()
-})
+);
 
 const User: Model<IUserModel> = model("User", userSchema);
 
