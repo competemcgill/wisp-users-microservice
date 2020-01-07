@@ -1,5 +1,10 @@
 # WISP Users Microservice
 
+## Dependencies:
+
+* recent version of Node.js + `npm`
+* recent version of MongoDB
+
 ## Running Server:
 
 For development:
