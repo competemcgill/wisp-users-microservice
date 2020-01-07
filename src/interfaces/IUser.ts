@@ -8,9 +8,7 @@ export interface IUser {
     info: IInfo;
     createdAt: string;
     updatedAt: string;
-    problems: {
-        [key: string]: IProblem;
-    };
+    problems: IProblem[];
 }
 
 export interface IInfo {
