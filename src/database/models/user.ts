@@ -4,14 +4,20 @@ import { IUser } from "../../interfaces/IUser";
 export interface IUserModel extends IUser, Document { }
 
 const userSchema: Schema = new Schema({
-    region: {
-        type: Schema.Types.ObjectId,
-        ref: "Region"
-    },
-    signalCount: Number,
     username: String,
-    email: String,
-    role: String,
+    email: {
+        type: String,
+        unique: true
+    },
+    password: {
+        type: String,
+        select: false
+    },
+    role: {
+        type: String,
+        enum: ["ADMIN", "USER"],
+        default: "USER"
+    },
     info: {
         major: String,
         year: String,
