@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Request, Response } from "express";
 import { userDBInteractions } from "../database/interactions/user";
 import { User, IUserModel } from "../database/models/user";
