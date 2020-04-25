@@ -43,15 +43,14 @@ const userController = {
                 const foundUser: IUserModel = await userDBInteractions.findByEmail(req.body.email);
                 if (foundUser) res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
                 else {
-                    // const userData: IUser = {
-                    //     ...req.body,
-                    //     regions: [],
-                    //     password: bcryptPassword.generateHash(req.body.password)
-                    // };
-                    // let newUser: IUserModel = await userDBInteractions.create(new User(userData));
-                    // newUser = newUser.toJSON();
-                    // delete newUser.password;
-                    // res.status(statusCodes.SUCCESS).send(newUser);
+                    const userData: IUser = {
+                        ...req.body,
+                        password: bcryptPassword.generateHash(req.body.password)
+                    };
+                    let newUser: IUserModel = await userDBInteractions.create(new User(userData));
+                    newUser = newUser.toJSON();
+                    delete newUser.password;
+                    res.status(statusCodes.SUCCESS).send(newUser);
                 }
             } catch (error) {
                 res.status(statusCodes.SERVER_ERROR).send(error);
@@ -70,22 +69,13 @@ const userController = {
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
-                    // const userObject: IUser = {
-                    //     email: user.email,
-                    //     regions: user.regions,
-                    //     password: user.password
-                    // };
-                    // const updatedVariables = {
-                    //     ...req.body,
-                    // };
-                    // if (req.body.password) updatedVariables["password"] = bcryptPassword.generateHash(req.body.password);
-                    // const updatedUserBody: IUser = {
-                    //     ...userObject,
-                    //     ...updatedVariables
-                    // };
+                    const updatedUserBody: IUser = {
+                        ...req.body,
+                    };
+                    if (req.body.password) updatedUserBody["password"] = bcryptPassword.generateHash(req.body.password);
 
-                    // const updatedUser: IUserModel = await userDBInteractions.update(userId, updatedUserBody);
-                    // res.status(statusCodes.SUCCESS).send(updatedUser);
+                    const updatedUser: IUserModel = await userDBInteractions.update(userId, updatedUserBody);
+                    res.status(statusCodes.SUCCESS).send(updatedUser);
                 }
             } catch (error) {
                 res.status(statusCodes.SERVER_ERROR).send(error);
