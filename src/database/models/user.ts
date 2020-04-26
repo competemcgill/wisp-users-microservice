@@ -7,36 +7,47 @@ const userSchema: Schema = new Schema({
     username: String,
     email: {
         type: String,
-        unique: true
+        unique: true,
     },
     password: {
         type: String,
-        select: false
+        select: false,
     },
     role: {
         type: String,
         enum: ["ADMIN", "USER"],
-        default: "USER"
+        default: "USER",
     },
     info: {
         major: String,
         year: String,
         school: String,
         bio: String,
-        profilePhoto: String
+        profilePhoto: String,
     },
-    problems: [{
-        problemId: {
-            type: Schema.Types.ObjectId,
-            ref: "Problem"
+    problems: [
+        {
+            problemId: String,
+            isComplete: Boolean,
+            status: String,
         },
-        isComplete: Boolean
-    }]
-},
-    {
-        timestamps: true
-    }
-);
+    ],
+    platformData: {
+        codeforces: {
+            username: String,
+            email: String,
+            latestSubmission: String,
+        },
+    },
+}, {
+    timestamps: true,
+});
+
+userSchema.index({
+    email: 1,
+}, {
+    unique: true,
+});
 
 const User: Model<IUserModel> = model("User", userSchema);
 

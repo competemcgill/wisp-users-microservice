@@ -82,6 +82,40 @@ const userController = {
         }
     },
 
+    addProblem: async (req: Request, res: Response) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(statusCodes.MISSING_PARAMS).json(errors.formatWith(errorMessage).array()[0]);
+        } else {
+            try {
+                const { userId } = req.params;
+                const { problemId, isComplete, status } = req.body;
+                const user: IUserModel = await userDBInteractions.find(userId, "+password");
+                if (!user)
+                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                else {
+                    const problemIndex = user.problems.findIndex((problem) => problem.problemId === problemId);
+                    const updatedProblem = {
+                        problemId,
+                        isComplete,
+                        status
+                    };
+
+                    if (problemIndex == -1) {
+                        user.problems.push(updatedProblem);
+                    } else {
+                        user.problems[problemIndex] = updatedProblem;
+                    }
+
+                    const updatedUser: IUserModel = await userDBInteractions.update(userId, user);
+                    res.status(statusCodes.SUCCESS).send(updatedUser);
+                }
+            } catch (error) {
+                res.status(statusCodes.SERVER_ERROR).send(error);
+            }
+        }
+    },
+
     delete: async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
