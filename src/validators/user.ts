@@ -18,9 +18,17 @@ export function userValidator(method: string): ValidationChain[] {
         }
         case "PUT /users/:userId": {
             return [
-                param("userId", "Invalid or missing ':userId'").exists().isMongoId(),
+                param("userId", "Invalid or missing ':userId'").exists().isString(),
                 body("email", "Invalid 'email'").optional().isEmail(),
                 body("password", "Invalid 'password'").optional().isString()
+            ];
+        }
+        case "PATCH /users/:userId/problems": {
+            return [
+                param("userId", "Invalid or missing ':userId'").exists().isMongoId(),
+                body("problemId", "Invalid or missing 'problemId'").exists().isString(),
+                body("isComplete", "Invalid or missing 'isComplete'").exists().isBoolean(),
+                body("status", "Invalid or missing 'status'").exists().isString()
             ];
         }
         case "DELETE /users/:userId": {
