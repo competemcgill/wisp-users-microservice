@@ -6,6 +6,7 @@ import { validationResult } from "express-validator/check";
 import { errorMessage } from "../config/errorFormatter";
 import { bcryptPassword } from "../config/bcrypt";
 import { statusCodes } from "../config/statusCodes";
+import { codeforces } from "../util/codeforces";
 
 const userController = {
 
@@ -26,6 +27,7 @@ const userController = {
             try {
                 const userId: string = req.params.userId;
                 const user: IUserModel = await userDBInteractions.find(userId);
+                await codeforces.updateUserProblems(user);
                 user ? res.status(statusCodes.SUCCESS).send(user) : res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
             } catch (error) {
                 res.status(statusCodes.SERVER_ERROR).send(error);
@@ -71,6 +73,7 @@ const userController = {
                     const updatedUserBody: IUser = {
                         ...req.body,
                     };
+
                     if (req.body.password) updatedUserBody["password"] = bcryptPassword.generateHash(req.body.password);
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, updatedUserBody);
@@ -101,11 +104,8 @@ const userController = {
                         status
                     };
 
-                    if (problemIndex == -1) {
-                        user.problems.push(updatedProblem);
-                    } else {
-                        user.problems[problemIndex] = updatedProblem;
-                    }
+                    if (problemIndex == -1) user.problems.push(updatedProblem);
+                    else user.problems[problemIndex] = updatedProblem;
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, user);
                     res.status(statusCodes.SUCCESS).send(updatedUser);

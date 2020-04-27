@@ -36,7 +36,11 @@ const userSchema: Schema = new Schema({
         codeforces: {
             username: String,
             email: String,
-            latestSubmission: String,
+            lastSubmission: {
+                problemId: String,
+                isComplete: Boolean,
+                status: String,
+            },
         },
     },
 }, {
