@@ -1,4 +1,5 @@
 import axios from "axios";
+import crypto from "crypto";
 import { IUserModel } from "../database/models/user";
 import { IProblem } from "../interfaces/IProblem";
 
@@ -8,12 +9,12 @@ export const codeforces = {
         const response = await axios.get("https://codeforces.com/api/user.status?handle=" + user.platformData.codeforces.username);
         const submissions = response.data.result;
 
-        let lastSubmission;
+        let lastSubmission: IProblem;
         const problems: IProblem[] = [];
-        submissions.some((submission, i) => {
-            const problemId = "codeforces-" + submission.problem.contestId + submission.problem.index;
-            const status = submission.verdict;
-            const isComplete = codeforces.convertStatus(status);
+        submissions.some((submission, i: number) => {
+            const problemId: string = crypto.createHash("sha1").update("codeforces" + submission.problem.contestId + submission.problem.index).digest("hex");
+            const status: string = submission.verdict;
+            const isComplete: boolean = codeforces.convertStatus(status);
             const problem: IProblem = {
                 problemId,
                 isComplete,
