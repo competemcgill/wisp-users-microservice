@@ -9,6 +9,13 @@ export interface IUser {
     createdAt: string;
     updatedAt: string;
     problems: IProblem[];
+    platformData: {
+        codeforces: {
+            username: string;
+            email: string;
+            lastSubmission: IProblem;
+        };
+    };
 }
 
 export interface IInfo {
