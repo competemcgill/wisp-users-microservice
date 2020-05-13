@@ -24,7 +24,7 @@ const authController = {
                         res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                     } else {
                         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.secret);
-                        res.status(statusCodes.SUCCESS).send({ token });
+                        res.status(statusCodes.SUCCESS).send({ token: token, user: user });
                     }
                 }
             } catch (error) {
