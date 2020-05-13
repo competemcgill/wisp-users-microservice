@@ -3,6 +3,12 @@ import { IUser } from "../../interfaces/IUser";
 
 export interface IUserModel extends IUser, Document { }
 
+const problemSchema: Schema = new Schema({
+    problemId: String,
+    isComplete: Boolean,
+    status: String,
+}, { _id: false });
+
 const userSchema: Schema = new Schema({
     username: String,
     email: {
@@ -25,13 +31,8 @@ const userSchema: Schema = new Schema({
         bio: String,
         profilePhoto: String,
     },
-    problems: [
-        {
-            problemId: String,
-            isComplete: Boolean,
-            status: String,
-        },
-    ],
+    problems: [problemSchema],
+    problemSets: [String],
     platformData: {
         codeforces: {
             username: String,

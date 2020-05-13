@@ -18,7 +18,7 @@ if (process.env.NODE_ENV != "test") app.use(requestLoggerConfig);
 if (process.env.NODE_ENV != "test") app.use(errorLoggerConfig);
 app.use(bodyParser.json());
 if (process.env.NODE_ENV == "dev") app.use(bodyParser.urlencoded({ extended: true }));
-if (process.env.NODE_ENV != "production") swaggerDoc(app);
+swaggerDoc(app);
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
 

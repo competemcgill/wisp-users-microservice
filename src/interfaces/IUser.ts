@@ -9,6 +9,7 @@ export interface IUser {
     createdAt: string;
     updatedAt: string;
     problems: IProblem[];
+    problemSets: string[];
     platformData: {
         codeforces: {
             username: string;
