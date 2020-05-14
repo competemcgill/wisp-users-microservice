@@ -12,7 +12,7 @@ export const codeforces = {
         let lastSubmission: IProblem;
         const problems: IProblem[] = [];
         submissions.some((submission, i: number) => {
-            const problemId: string = crypto.createHash("sha1").update("codeforces" + submission.problem.contestId + submission.problem.index).digest("hex");
+            const problemId: string = crypto.createHash("sha1").update("CODEFORCES" + submission.problem.contestId + submission.problem.index.toUpperCase()).digest("hex");
             const status: string = submission.verdict;
             const isComplete: boolean = codeforces.convertStatus(status);
             const problem: IProblem = {
