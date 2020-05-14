@@ -31,6 +31,12 @@ export function userValidator(method: string): ValidationChain[] {
                 body("status", "Invalid or missing 'status'").exists().isString()
             ];
         }
+        case "PATCH /users/:userId/problemSets": {
+            return [
+                param("userId", "Invalid or missing ':userId'").exists().isMongoId(),
+                body("problemSetId", "Invalid or missing 'problemId'").exists().isMongoId()
+            ];
+        }
         case "DELETE /users/:userId": {
             return [
                 param("userId", "Invalid or missing ':userId'").exists().isMongoId()

@@ -14,6 +14,8 @@ userRouter.put("/:userId", userValidator("PUT /users/:userId"), userController.u
 
 userRouter.patch("/:userId/problems", userValidator("PATCH /users/:userId/problems"), userController.addProblem);
 
+userRouter.patch("/:userId/problemSets", userValidator("PATCH /users/:userId/problemSets"), userController.addProblemSet);
+
 userRouter.delete("/:userId", userValidator("DELETE /users/:userId"), userController.delete);
 
 export { userRouter };
