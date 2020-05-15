@@ -12,6 +12,7 @@ export function userValidator(method: string): ValidationChain[] {
         }
         case "POST /users": {
             return [
+                body("username", "Invalid or missing 'username'").exists().isString(),
                 body("email", "Invalid or missing 'email'").exists().isEmail(),
                 body("password", "Invalid or missing 'password'").exists().isString()
             ];

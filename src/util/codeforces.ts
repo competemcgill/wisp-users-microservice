@@ -12,6 +12,7 @@ export const codeforces = {
             submissions = response.data.result;
         } catch (err) {
             console.log(err);
+            return;
         }
 
         let lastSubmission: IProblem;
