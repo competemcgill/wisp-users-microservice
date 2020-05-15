@@ -6,6 +6,7 @@ import { userDBInteractions } from "../database/interactions/user";
 import { IUserModel } from "../database/models/user";
 import { bcryptPassword } from "../config/bcrypt";
 import { statusCodes } from "../config/statusCodes";
+import { codeforces } from "../util/codeforces";
 
 const authController = {
 
@@ -23,7 +24,8 @@ const authController = {
                     if (!bcryptPassword.validate(password, user.password)) {
                         res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                     } else {
-                        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.secret);
+                        if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
+                        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET);
                         const userJSON = user.toJSON();
                         delete userJSON.password;
                         res.status(statusCodes.SUCCESS).send({ token: token, user: userJSON });
@@ -42,7 +44,7 @@ const authController = {
         } else {
             try {
                 const { token } = req.query;
-                const payload = jwt.verify(token, process.env.secret);
+                const payload = jwt.verify(token, process.env.SECRET);
                 res.status(statusCodes.SUCCESS).send({ active: true, user: payload });
             } catch (error) {
                 res.status(statusCodes.UNAUTHORIZED).send({ status: statusCodes.UNAUTHORIZED, message: "Unauthorized", active: false });

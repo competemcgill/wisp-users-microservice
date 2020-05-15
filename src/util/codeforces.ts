@@ -6,8 +6,13 @@ import { IProblem } from "../interfaces/IProblem";
 export const codeforces = {
 
     updateUserProblems: async (user: IUserModel) => {
-        const response = await axios.get("https://codeforces.com/api/user.status?handle=" + user.platformData.codeforces.username);
-        const submissions = response.data.result;
+        let response, submissions;
+        try {
+            response = await axios.get("https://codeforces.com/api/user.status?handle=" + user.platformData.codeforces.username);
+            submissions = response.data.result;
+        } catch (err) {
+            console.log(err);
+        }
 
         let lastSubmission: IProblem;
         const problems: IProblem[] = [];
@@ -29,17 +34,18 @@ export const codeforces = {
             else problems[problemIndex] = problem;
         });
 
-        // ////////////////////////////////
-        // Verify that problem exists in problems microservice
-        // ////////////////////////////////
-
         user.platformData.codeforces.lastSubmission = lastSubmission;
 
-        problems.some(problem => {
-            const problemIndex = user.problems.findIndex((dbProblem) => problem.problemId === dbProblem.problemId);
-            if (problemIndex == -1) user.problems.push(problem);
-            else user.problems[problemIndex] = problem;
-        });
+        for (const problem of problems) {
+            try {
+                const check = await axios.get(`${process.env.WISP_PROBLEMS_URL}/problems/${lastSubmission.problemId}/exists`);
+                if (check.status == 200) {
+                    const problemIndex = user.problems.findIndex((dbProblem) => problem.problemId === dbProblem.problemId);
+                    if (problemIndex == -1) user.problems.push(problem);
+                    else user.problems[problemIndex] = problem;
+                }
+            } catch (err) { }
+        }
 
         await user.save();
     },

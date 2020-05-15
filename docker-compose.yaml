@@ -7,17 +7,14 @@ services:
       - .:/app
     environment:
       - NODE_ENV=dev
-      - secret=Ks10daK3g
+      - SECRET=Ks10daK3g
+      - WISP_PROBLEMS_URL=http://localhost:8080
     working_dir: /app
     command: npm run start:local
-    ports:
-      - 3000:3000
-    links:
-      - mongo
+    network_mode: host
   mongo:
     container_name: mongo
     image: mongo
+    network_mode: host
     logging:
       driver: none
-    ports:
-      - 27017:27017
