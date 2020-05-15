@@ -27,8 +27,12 @@ const userController = {
             try {
                 const userId: string = req.params.userId;
                 const user: IUserModel = await userDBInteractions.find(userId);
-                await codeforces.updateUserProblems(user);
-                user ? res.status(statusCodes.SUCCESS).send(user) : res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                if (!user)
+                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                else {
+                    if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
+                    user ? res.status(statusCodes.SUCCESS).send(user) : res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                }
             } catch (error) {
                 res.status(statusCodes.SERVER_ERROR).send(error);
             }
