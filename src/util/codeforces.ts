@@ -32,7 +32,6 @@ export const codeforces = {
 
             const problemIndex = problems.findIndex((problem) => problem.problemId === problemId);
             if (problemIndex == -1) problems.push(problem);
-            else problems[problemIndex] = problem;
         });
 
         user.platformData.codeforces.lastSubmission = lastSubmission;
