@@ -39,7 +39,7 @@ export const codeforces = {
 
         for (const problem of problems) {
             try {
-                const check = await axios.get(`${process.env.WISP_PROBLEMS_URL}/problems/${lastSubmission.problemId}/exists`);
+                const check = await axios.get(`${process.env.WISP_PROBLEMS_URL}/problems/${problem.problemId}/exists`);
                 if (check.status == 200) {
                     const problemIndex = user.problems.findIndex((dbProblem) => problem.problemId === dbProblem.problemId);
                     if (problemIndex == -1) user.problems.push(problem);
