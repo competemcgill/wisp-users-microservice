@@ -1,13 +1,9 @@
-name: Build, Tag, and Deploy to DockerHub
+name: Build, Tag, and Publish to DockerHub
 
 on:
   push:
     branches:
       - master
-  release:
-    types:
-      - created
-
 
 # Environment variables available to all jobs and steps in this workflow
 env:
@@ -17,8 +13,8 @@ env:
   IMAGE: wisp-users
 
 jobs:
-  setup-build-tag-push:
-    name: Setup, Build, Tag, and Push
+  setup-build-tag-publish:
+    name: Setup, Build, Tag, and Publish
     runs-on: ubuntu-latest
     steps:
 
