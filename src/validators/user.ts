@@ -26,7 +26,9 @@ export function userValidator(method: string): ValidationChain[] {
             return [
                 param("userId", "Invalid or missing ':userId'").exists().isString(),
                 body("email", "Invalid 'email'").optional().isEmail(),
-                body("password", "Invalid 'password'").optional().isString()
+                body("password", "Invalid 'password'").optional().isString(),
+                body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
+                    .custom(validPassword)
             ];
         }
         case "PATCH /users/:userId/problems": {
