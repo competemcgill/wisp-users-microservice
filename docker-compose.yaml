@@ -9,6 +9,7 @@ services:
       - NODE_ENV=dev
       - SECRET=Ks10daK3g
       - WISP_PROBLEMS_URL=http://problems-api:3000
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
     working_dir: /app
     command: npm run start:local
     ports:

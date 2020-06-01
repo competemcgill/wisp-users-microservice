@@ -8,6 +8,8 @@ import { requestLoggerConfig } from "./config/requestLogger";
 import { errorLoggerConfig } from "./config/errorLogger";
 import { userRouter } from "./routes/user";
 import { authRouter } from "./routes/auth";
+import { logger } from "./config/logger";
+import mailer from "@sendgrid/mail";
 
 export const port: Number = parseInt(process.env.SERVER_PORT) || 3000;
 const app: Application = express();
@@ -24,6 +26,14 @@ app.use("/auth", authRouter);
 
 const env = process.env.NODE_ENV || "dev";
 
+const emailAPIKey: string = process.env.SENDGRID_API_KEY || null;
+if (!emailAPIKey) {
+    logger.error("Sendgrid API Key for mailer service not set (SENDGRID_API_KEY)");
+} else {
+    mailer.setApiKey(emailAPIKey);
+}
+
+
 app.use((req: Request, res: Response) => {
     res.status(404).send({
         status: 404,
@@ -31,4 +41,4 @@ app.use((req: Request, res: Response) => {
     });
 });
 
-export { app };
+export { app, mailer };
