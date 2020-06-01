@@ -1,20 +1,33 @@
 version: "3"
 services:
-  api:
+  users-api:
     image: node:11.13.0-alpine
-    container_name: api
+    container_name: users-api
     volumes:
       - .:/app
     environment:
       - NODE_ENV=dev
       - SECRET=Ks10daK3g
-      - WISP_PROBLEMS_URL=http://localhost:3001
+      - WISP_PROBLEMS_URL=http://problems-api:3000
     working_dir: /app
     command: npm run start:local
-    network_mode: host
+    ports:
+      - 3000:3000
+    links:
+      - mongo
+      - problems-api
+  problems-api:
+    image: competemcgill/wisp-problems:dev-latest
+    container_name: problems-api
+    environment:
+      - NODE_ENV=dev
+      - DB_URL=mongodb://mongo:27017/wisp
+    ports:
+      - 3001:3000
+    links:
+      - mongo
   mongo:
     container_name: mongo
     image: mongo
-    network_mode: host
     logging:
       driver: none

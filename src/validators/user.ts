@@ -1,4 +1,5 @@
 import { body, param, ValidationChain } from "express-validator/check";
+import { validUsername, validPassword } from "./userCustom";
 
 export function userValidator(method: string): ValidationChain[] {
     switch (method) {
@@ -13,15 +14,21 @@ export function userValidator(method: string): ValidationChain[] {
         case "POST /users": {
             return [
                 body("username", "Invalid or missing 'username'").exists().isString(),
+                body("username", "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'")
+                    .custom(validUsername),
                 body("email", "Invalid or missing 'email'").exists().isEmail(),
-                body("password", "Invalid or missing 'password'").exists().isString()
+                body("password", "Invalid or missing 'password'").exists().isString(),
+                body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
+                    .custom(validPassword)
             ];
         }
         case "PUT /users/:userId": {
             return [
                 param("userId", "Invalid or missing ':userId'").exists().isString(),
                 body("email", "Invalid 'email'").optional().isEmail(),
-                body("password", "Invalid 'password'").optional().isString()
+                body("password", "Invalid 'password'").optional().isString(),
+                body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
+                    .custom(validPassword)
             ];
         }
         case "PATCH /users/:userId/problems": {
