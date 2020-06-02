@@ -54,7 +54,7 @@ describe("Users controller tests", () => {
         stubs.userUtil.restore();
     });
 
-    describe("USERS: index", () => {
+    describe("Index", () => {
 
         it("status 200: returns a list of a single user", async () => {
             stubs.userDB.all.returns([testUser]);
@@ -80,13 +80,13 @@ describe("Users controller tests", () => {
         });
     });
 
-    describe("USERS: show", () => {
+    describe("Show", () => {
 
         let req;
         beforeEach(() => {
             req = mockReq({
                 params: {
-                    userId: "507f1f77bcf86cd799439011"
+                    userId: testUser._id
                 }
             });
         });
@@ -140,7 +140,7 @@ describe("Users controller tests", () => {
         });
     });
 
-    describe("USERS: create", () => {
+    describe("Create", () => {
 
         let req;
         beforeEach(() => {
@@ -208,7 +208,77 @@ describe("Users controller tests", () => {
         });
     });
 
-    describe("USERS: update", () => { });
+    describe("Update", () => {
 
-    describe("USERS: delete", () => { });
+        let req;
+        beforeEach(() => {
+            req = mockReq({
+                body: {
+                    ...testUser,
+                    password: "password",
+                    info: { ...testUser.info },
+                    platformData: {
+                        ...testUser.platformData,
+                        codeforces: { ...testUser.platformData.codeforces }
+                    }
+                },
+                params: {
+                    userId: testUser._id
+                }
+            });
+        });
+
+        it("status 200: returns updated user", async () => {
+            const updatedUser = JSON.parse(JSON.stringify(testUser));
+            updatedUser.username = "update test";
+            req.body.username = "update test";
+            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userDB.find.returns(testUser);
+            stubs.userDB.update.returns(updatedUser);
+            await userController.update(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledOnce(stubs.userDB.update);
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+            sinon.assert.calledWith(mockRes.json, updatedUser);
+        });
+
+        it("status 400: returns an appropriate response if user already exists", async () => {
+            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userDB.find.returns(null);
+            await userController.update(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
+            sinon.assert.calledWith(mockRes.json, { status: statusCodes.NOT_FOUND, message: "User not found" });
+        });
+
+        it("status 422: returns an appropriate response with validation errors", async () => {
+            const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "body[email]: Invalid 'email'" };
+            req.body.email = "not an email";
+            stubs.userValidator.validationResult.returns({
+                isEmpty() { return false; },
+                formatWith() {
+                    return {
+                        array() {
+                            return [errorMsg];
+                        }
+                    };
+                },
+            });
+            await userController.update(req, mockRes);
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
+            sinon.assert.calledWith(mockRes.json, errorMsg);
+        });
+
+        it("status 500: returns an appropriate response if server fails", async () => {
+            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userDB.find.returns(testUser);
+            stubs.userDB.update.throws();
+            await userController.update(req, mockRes);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
+        });
+    });
+
+    describe("Delete", () => { });
 });
