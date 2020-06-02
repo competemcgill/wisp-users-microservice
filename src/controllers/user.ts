@@ -99,7 +99,7 @@ const userController = {
             try {
                 const { userId } = req.params;
                 const { problemId, isComplete, status } = req.body;
-                const user: IUserModel = await userDBInteractions.find(userId, "+password");
+                const user: IUserModel = await userDBInteractions.find(userId);
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
