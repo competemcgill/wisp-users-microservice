@@ -39,6 +39,7 @@
     "@types/mongodb": "^3.1.26",
     "@types/mongoose": "^5.5.0",
     "@types/node": "^11.13.10",
+    "@types/sinon": "^9.0.4",
     "@types/winston": "^2.4.4",
     "axios": "^0.18.1",
     "bcryptjs": "^2.4.3",
@@ -56,14 +57,14 @@
     "mongoose": "^5.5.7",
     "nodemon": "^1.19.0",
     "nyc": "^14.1.1",
+    "sinon": "^9.0.2",
+    "sinon-express-mock": "^2.2.1",
     "source-map-support": "^0.5.12",
     "swagger-jsdoc": "^3.2.9",
     "swagger-ui-express": "^4.0.2",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5",
-    "winston": "^3.2.1",
-    "sinon": "^9.0.2",
-    "sinon-express-mock": "^2.2.1"
+    "winston": "^3.2.1"
   }
 }

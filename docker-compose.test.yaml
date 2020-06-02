@@ -5,6 +5,7 @@ services:
     container_name: api
     environment:
       - NODE_ENV=tests
+      - SECRET=secret
       - DB_URL=mongodb://mongo:27017/wisp
     volumes:
       - .:/app

@@ -25,7 +25,7 @@ const authController = {
                         res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                     } else {
                         if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
-                        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET);
+                        const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.SECRET);
                         const userJSON = user.toJSON();
                         delete userJSON.password;
                         res.status(statusCodes.SUCCESS).json({ token: token, user: userJSON });
