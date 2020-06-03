@@ -7,6 +7,7 @@ import { jwtStubs } from "../stubs/auth";
 import { mockReq, mockRes } from "sinon-express-mock";
 import { bcryptPassword } from "../../../src/config/bcrypt";
 import { statusCodes } from "../../../src/config/statusCodes";
+import { emptyValidationError, validationErrorWithMessage } from "../../utils/consts/validation";
 
 let stubs;
 const testUser: IUserModel = new User({
@@ -71,7 +72,7 @@ describe("Auth controller tests", () => {
         });
 
         it("status 200: returns a token with it's user", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             await authController.introspect(req, mockRes);
             sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
             sinon.assert.calledWith(mockRes.json, { active: true, user: { email: testUser.email, id: `${testUser._id}`, role: testUser.role, iat: testTokenIat } });
@@ -80,16 +81,7 @@ describe("Auth controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "query[token]: Missing 'token'" };
             req.query.token = "not a token";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await authController.introspect(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -97,7 +89,7 @@ describe("Auth controller tests", () => {
         });
 
         it("status 401: returns unauthorized if invalid token is sent", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             req.query.token = "not a token";
             await authController.introspect(req, mockRes);
             sinon.assert.calledWith(mockRes.status, statusCodes.UNAUTHORIZED);
@@ -117,7 +109,7 @@ describe("Auth controller tests", () => {
         });
 
         it("status 200: returns new user", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByEmail.returns(testUser);
             stubs.userUtil.codeforces.updateUserProblems.returns();
             stubs.jwt.sign.returns(testToken);
@@ -132,7 +124,7 @@ describe("Auth controller tests", () => {
         });
 
         it("status 400: returns an appropriate response if user doesn't exist", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByEmail.returns(null);
             await authController.login(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
@@ -142,7 +134,7 @@ describe("Auth controller tests", () => {
 
         it("status 400: returns an appropriate response if email and password don't match", async () => {
             req.body.password = "bad password";
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByEmail.returns(testUser);
             await authController.login(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
@@ -153,16 +145,7 @@ describe("Auth controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "body[email]: Invalid or missing 'email'" };
             req.body.email = "not an email";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await authController.login(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -170,7 +153,7 @@ describe("Auth controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByEmail.throws();
             await authController.login(req, mockRes);
             sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);

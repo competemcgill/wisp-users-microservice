@@ -5,6 +5,7 @@ import { userDBInteractionsStubs, userValidatorStubs, userUtilStubs } from "../s
 import { mockReq, mockRes } from "sinon-express-mock";
 import { bcryptPassword } from "../../../src/config/bcrypt";
 import { statusCodes } from "../../../src/config/statusCodes";
+import { emptyValidationError, validationErrorWithMessage } from "../../utils/consts/validation";
 
 let stubs;
 const testUser: IUserModel = new User({
@@ -91,7 +92,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 200: returns user with given id", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userUtil.codeforces.updateUserProblems.returns();
             await userController.show(req, mockRes);
@@ -103,8 +104,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 404: returns an appropriate response if user with given id doesn't exist", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.find.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             await userController.show(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
@@ -115,16 +115,7 @@ describe("Users controller tests", () => {
         it("status 422: returns an appropriate response with validation error", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "params[userId]: Invalid or missing ':userId'" };
             req.params.userId = "not ObjectId";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await userController.show(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -132,7 +123,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.throws();
             await userController.show(mockReq, mockRes);
             sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
@@ -157,8 +148,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 200: returns new user", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.findByEmail.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.create.returns(testUser);
             await userController.create(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
@@ -170,8 +160,8 @@ describe("Users controller tests", () => {
             sinon.assert.calledWith(mockRes.json, tmp);
         });
 
-        it("status 400: returns an appropriate response if user already exists", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+        it("status 400: returns an appropriate response if user with email already exists", async () => {
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByEmail.returns(testUser);
             await userController.create(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
@@ -182,16 +172,7 @@ describe("Users controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "body[email]: Invalid or missing 'email'" };
             req.body.email = "not an email";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await userController.create(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -199,8 +180,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.findByEmail.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.create.throws();
             await userController.create(req, mockRes);
             sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
@@ -231,7 +211,7 @@ describe("Users controller tests", () => {
             const updatedUser = JSON.parse(JSON.stringify(testUser));
             updatedUser.username = "update test";
             req.body.username = "update test";
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.returns(updatedUser);
             await userController.update(req, mockRes);
@@ -243,8 +223,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 404: returns an appropriate response if user doesn't exist", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.find.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             await userController.update(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
@@ -254,16 +233,7 @@ describe("Users controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "body[email]: Invalid 'email'" };
             req.body.email = "not an email";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await userController.update(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -271,7 +241,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.throws();
             await userController.update(req, mockRes);
@@ -298,7 +268,7 @@ describe("Users controller tests", () => {
         it("status 200: returns updated user", async () => {
             const updatedUser = JSON.parse(JSON.stringify(testUser));
             updatedUser.problems.push(req.body);
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.returns(updatedUser);
             await userController.addProblem(req, mockRes);
@@ -310,8 +280,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 404: returns an appropriate response if user doesn't exist", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.find.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             await userController.addProblem(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
@@ -321,16 +290,7 @@ describe("Users controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "body[email]: Invalid 'email'" };
             req.body.email = "not an email";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await userController.addProblem(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -338,7 +298,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.throws();
             await userController.addProblem(req, mockRes);
@@ -363,7 +323,7 @@ describe("Users controller tests", () => {
         it("status 200: returns updated user", async () => {
             const updatedUser = JSON.parse(JSON.stringify(testUser));
             updatedUser.problems.push(req.body.problemSetId);
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.returns(updatedUser);
             await userController.addProblemSet(req, mockRes);
@@ -375,8 +335,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 404: returns an appropriate response if user doesn't exist", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.find.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             await userController.addProblemSet(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
@@ -386,16 +345,7 @@ describe("Users controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "body[email]: Invalid 'email'" };
             req.body.email = "not an email";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await userController.addProblemSet(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -403,7 +353,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.throws();
             await userController.addProblemSet(req, mockRes);
@@ -423,7 +373,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 200: returns empty response after user deletion", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.delete.returns(testUser);
             await userController.delete(req, mockRes);
@@ -435,8 +385,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 404: returns an appropriate response if user doesn't exist", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
-            stubs.userDB.find.returns(null);
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             await userController.delete(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
@@ -446,16 +395,7 @@ describe("Users controller tests", () => {
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = { status: statusCodes.MISSING_PARAMS, message: "params[email]: Invalid or missing ':userId'" };
             req.params.userId = "not an ObjectId";
-            stubs.userValidator.validationResult.returns({
-                isEmpty() { return false; },
-                formatWith() {
-                    return {
-                        array() {
-                            return [errorMsg];
-                        }
-                    };
-                },
-            });
+            stubs.userValidator.validationResult.returns(validationErrorWithMessage(errorMsg));
             await userController.delete(req, mockRes);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
@@ -463,7 +403,7 @@ describe("Users controller tests", () => {
         });
 
         it("status 500: returns an appropriate response if server fails", async () => {
-            stubs.userValidator.validationResult.returns({ isEmpty() { return true; } });
+            stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.delete.throws();
             await userController.delete(req, mockRes);
