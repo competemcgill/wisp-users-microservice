@@ -47,9 +47,11 @@ const userController = {
             res.status(statusCodes.MISSING_PARAMS).json({ status: statusCodes.MISSING_PARAMS, message: "body[platformData.codeforces.username]: Invalid or missing 'platformData.codeforces.username'" });
         } else {
             try {
-                const foundByEmail: IUserModel = await userDBInteractions.findByEmail(req.body.email);
-                const foundByUsername: IUserModel = await userDBInteractions.findByUsername(req.body.username);
-                if (foundByUsername || foundByEmail) res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
+                if ( await userDBInteractions.findByEmail(req.body.email) ) {
+                    return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
+                } else if ( await userDBInteractions.findByUsername(req.body.username) ) {
+                    return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that username already exists"});
+                }
                 else {
                     const userData: IUser = {
                         ...req.body,
@@ -77,6 +79,13 @@ const userController = {
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
+                    const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
+                    const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
+                    if ( foundByEmail && !(foundByEmail._id.equals(user._id)) ) {
+                        return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
+                    } else if ( foundByUsername && !(foundByUsername._id.equals(user._id)) ) {
+                        return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that username already exists" });
+                    }
                     const updatedUserBody: IUser = {
                         ...req.body,
                     };
