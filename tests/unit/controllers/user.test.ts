@@ -5,8 +5,7 @@ import { userDBInteractionsStubs, userValidatorStubs, userUtilStubs } from "../s
 import { mockReq, mockRes } from "sinon-express-mock";
 import { bcryptPassword } from "../../../src/config/bcrypt";
 import { statusCodes } from "../../../src/config/statusCodes";
-import {emptyValidationError, validationErrorWithMessage} from "../../utils/consts/validation";
-import {error} from "util";
+import { emptyValidationError, validationErrorWithMessage } from "../../utils/consts/validation";
 
 let stubs;
 const testUser: IUserModel = new User({
