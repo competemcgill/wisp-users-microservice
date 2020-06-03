@@ -10,7 +10,10 @@ const problemSchema: Schema = new Schema({
 }, { _id: false });
 
 const userSchema: Schema = new Schema({
-    username: String,
+    username: {
+        type: String,
+        unique: true,
+    },
     email: {
         type: String,
         unique: true,

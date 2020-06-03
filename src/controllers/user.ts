@@ -47,8 +47,9 @@ const userController = {
             res.status(statusCodes.MISSING_PARAMS).json({ status: statusCodes.MISSING_PARAMS, message: "body[platformData.codeforces.username]: Invalid or missing 'platformData.codeforces.username'" });
         } else {
             try {
-                const foundUser: IUserModel = await userDBInteractions.findByEmail(req.body.email);
-                if (foundUser) res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
+                const foundByEmail: IUserModel = await userDBInteractions.findByEmail(req.body.email);
+                const foundByUsername: IUserModel = await userDBInteractions.findByUsername(req.body.username);
+                if (foundByUsername || foundByEmail) res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
                 else {
                     const userData: IUser = {
                         ...req.body,
@@ -79,7 +80,6 @@ const userController = {
                     const updatedUserBody: IUser = {
                         ...req.body,
                     };
-
                     if (req.body.password) updatedUserBody["password"] = bcryptPassword.generateHash(req.body.password);
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, updatedUserBody);
