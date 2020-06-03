@@ -1,5 +1,5 @@
 import { body, param, ValidationChain } from "express-validator/check";
-import { validUsername, validPassword } from "./userCustom";
+import {validUsername, validPassword, hasCodeforces, hasCodeforcesUser} from "./userCustom";
 
 export function userValidator(method: string): ValidationChain[] {
     switch (method) {
@@ -19,7 +19,10 @@ export function userValidator(method: string): ValidationChain[] {
                 body("email", "Invalid or missing 'email'").exists().isEmail(),
                 body("password", "Invalid or missing 'password'").exists().isString(),
                 body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
-                    .custom(validPassword)
+                    .custom(validPassword),
+                body("platformData", "Missing 'platformData'").exists(),
+                body("platformData", "Missing 'platformData.codeforces'").custom(hasCodeforces),
+                body("platformData", "Missing 'platformData.codeforces.user").custom(hasCodeforcesUser)
             ];
         }
         case "PUT /users/:userId": {
@@ -28,7 +31,10 @@ export function userValidator(method: string): ValidationChain[] {
                 body("email", "Invalid 'email'").optional().isEmail(),
                 body("password", "Invalid 'password'").optional().isString(),
                 body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
-                    .custom(validPassword)
+                    .custom(validPassword),
+                body("platformData", "Missing 'platformData'").exists(),
+                body("platformData", "Missing 'platformData.codeforces'").custom(hasCodeforces),
+                body("platformData", "Missing 'platformData.codeforces.user").custom(hasCodeforcesUser)
             ];
         }
         case "PATCH /users/:userId/problems": {
