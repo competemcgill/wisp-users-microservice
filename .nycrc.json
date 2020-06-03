@@ -4,6 +4,9 @@
         "src/**/*.ts"
     ],
     "exclude": [
-        "src/database/**/*.ts"
+        "src/database/**/*.ts",
+        "src/config/statusCodes.ts",
+        "src/config/*ogger.ts",
+        "src/config/bcrypt.ts"
     ]
 }
