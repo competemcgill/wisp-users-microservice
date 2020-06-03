@@ -28,7 +28,7 @@ const testUser: IUserModel = new User({
             email: "test@gmail.com",
         },
     },
-    _id: "5cedfdsa2q34sfa242",
+    _id: "5ed7505cf09e10001e5084b7",
 });
 const testUser2: IUserModel = new User({
     username: "test2",
@@ -50,7 +50,7 @@ const testUser2: IUserModel = new User({
             email: "test2@gmail.com",
         },
     },
-    _id: "5asdfewrdv3rw",
+    _id: "5ed7510ae853dc003879a82f",
 });
 
 
@@ -267,6 +267,8 @@ describe("Users controller tests", () => {
             stubs.userDB.update.returns(updatedUser);
             await userController.update(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledOnce(stubs.userDB.findByEmail);
+            sinon.assert.calledOnce(stubs.userDB.findByUsername);
             sinon.assert.calledOnce(stubs.userDB.update);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
@@ -283,6 +285,8 @@ describe("Users controller tests", () => {
             stubs.userDB.update.returns(updatedUser);
             await userController.update(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledOnce(stubs.userDB.findByEmail);
+            sinon.assert.calledOnce(stubs.userDB.findByUsername);
             sinon.assert.calledOnce(stubs.userDB.update);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
