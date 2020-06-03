@@ -19,20 +19,20 @@ const authController = {
                 const { email, password } = req.body;
                 const user: IUserModel = await userDBInteractions.findByEmail(email, "+password");
                 if (!user) {
-                    res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
+                    res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                 } else {
                     if (!bcryptPassword.validate(password, user.password)) {
-                        res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
+                        res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                     } else {
                         if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
-                        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET);
+                        const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.SECRET);
                         const userJSON = user.toJSON();
                         delete userJSON.password;
-                        res.status(statusCodes.SUCCESS).send({ token: token, user: userJSON });
+                        res.status(statusCodes.SUCCESS).json({ token: token, user: userJSON });
                     }
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     },
@@ -45,9 +45,9 @@ const authController = {
             try {
                 const { token } = req.query;
                 const payload = jwt.verify(token, process.env.SECRET);
-                res.status(statusCodes.SUCCESS).send({ active: true, user: payload });
+                res.status(statusCodes.SUCCESS).json({ active: true, user: payload });
             } catch (error) {
-                res.status(statusCodes.UNAUTHORIZED).send({ status: statusCodes.UNAUTHORIZED, message: "Unauthorized", active: false });
+                res.status(statusCodes.UNAUTHORIZED).json({ status: statusCodes.UNAUTHORIZED, message: "Unauthorized", active: false });
             }
         }
     }

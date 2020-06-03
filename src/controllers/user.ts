@@ -13,9 +13,9 @@ const userController = {
     index: async (req: Request, res: Response) => {
         try {
             const users = await userDBInteractions.all();
-            res.status(statusCodes.SUCCESS).send(users);
+            res.status(statusCodes.SUCCESS).json(users);
         } catch (err) {
-            res.status(statusCodes.SERVER_ERROR).send(err);
+            res.status(statusCodes.SERVER_ERROR).json(err);
         }
     },
 
@@ -28,13 +28,13 @@ const userController = {
                 const userId: string = req.params.userId;
                 const user: IUserModel = await userDBInteractions.find(userId);
                 if (!user)
-                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                    res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
                     if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
-                    user ? res.status(statusCodes.SUCCESS).send(user) : res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                    user ? res.status(statusCodes.SUCCESS).json(user) : res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     },
@@ -48,7 +48,7 @@ const userController = {
         } else {
             try {
                 const foundUser: IUserModel = await userDBInteractions.findByEmail(req.body.email);
-                if (foundUser) res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
+                if (foundUser) res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
                 else {
                     const userData: IUser = {
                         ...req.body,
@@ -57,10 +57,10 @@ const userController = {
                     let newUser: IUserModel = await userDBInteractions.create(new User(userData));
                     newUser = newUser.toJSON();
                     delete newUser.password;
-                    res.status(statusCodes.SUCCESS).send(newUser);
+                    res.status(statusCodes.SUCCESS).json(newUser);
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     },
@@ -74,7 +74,7 @@ const userController = {
                 const { userId } = req.params;
                 const user: IUserModel = await userDBInteractions.find(userId, "+password");
                 if (!user)
-                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                    res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
                     const updatedUserBody: IUser = {
                         ...req.body,
@@ -83,10 +83,10 @@ const userController = {
                     if (req.body.password) updatedUserBody["password"] = bcryptPassword.generateHash(req.body.password);
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, updatedUserBody);
-                    res.status(statusCodes.SUCCESS).send(updatedUser);
+                    res.status(statusCodes.SUCCESS).json(updatedUser);
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     },
@@ -99,9 +99,9 @@ const userController = {
             try {
                 const { userId } = req.params;
                 const { problemId, isComplete, status } = req.body;
-                const user: IUserModel = await userDBInteractions.find(userId, "+password");
+                const user: IUserModel = await userDBInteractions.find(userId);
                 if (!user)
-                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                    res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
                     const problemIndex = user.problems.findIndex((problem) => problem.problemId === problemId);
                     const updatedProblem = {
@@ -114,10 +114,10 @@ const userController = {
                     else user.problems[problemIndex] = updatedProblem;
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, user);
-                    res.status(statusCodes.SUCCESS).send(updatedUser);
+                    res.status(statusCodes.SUCCESS).json(updatedUser);
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     },
@@ -132,16 +132,16 @@ const userController = {
                 const { problemSetId } = req.body;
                 const user: IUserModel = await userDBInteractions.find(userId);
                 if (!user)
-                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                    res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
                     const problemSetIndex = user.problemSets.findIndex((id) => id === problemSetId);
                     if (problemSetIndex == -1) user.problemSets.push(problemSetId);
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, user);
-                    res.status(statusCodes.SUCCESS).send(updatedUser);
+                    res.status(statusCodes.SUCCESS).json(updatedUser);
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     },
@@ -155,13 +155,13 @@ const userController = {
                 const { userId } = req.params;
                 const user: IUserModel = await userDBInteractions.find(userId);
                 if (!user) {
-                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                    res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 } else {
                     await userDBInteractions.delete(userId);
-                    res.status(statusCodes.SUCCESS).send();
+                    res.status(statusCodes.SUCCESS).json();
                 }
             } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).send(error);
+                res.status(statusCodes.SERVER_ERROR).json(error);
             }
         }
     }
