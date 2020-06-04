@@ -57,6 +57,12 @@ userSchema.index({
     unique: true,
 });
 
+userSchema.index({
+    username: 1,
+}, {
+    unique: true,
+});
+
 const User: Model<IUserModel> = model("User", userSchema);
 
 export { User };
