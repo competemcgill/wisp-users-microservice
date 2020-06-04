@@ -6,10 +6,10 @@ export const validPassword = (password: string): boolean => {
     return password ? (password.length > 5) && (password.indexOf(" ") === -1) : true;
 };
 
-export const hasCodeforces = (platformData: Object): boolean => {
+export const hasCodeforcesUserData = (platformData: Object): boolean => {
     return platformData.hasOwnProperty("codeforces");
 }
 
-export const hasCodeforcesUser = (platformData: Object): boolean => {
-    return platformData["codeforces"].hasOwnProperty("user");
+export const hasCodeforcesUsername = (platformData: Object): boolean => {
+    return platformData["codeforces"].hasOwnProperty("username");
 }

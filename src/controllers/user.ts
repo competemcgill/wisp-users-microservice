@@ -30,7 +30,7 @@ const userController = {
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
-                    if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
+                    await codeforces.updateUserProblems(user);
                     user ? res.status(statusCodes.SUCCESS).json(user) : res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 }
             } catch (error) {
