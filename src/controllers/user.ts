@@ -47,9 +47,11 @@ const userController = {
             res.status(statusCodes.MISSING_PARAMS).json({ status: statusCodes.MISSING_PARAMS, message: "body[platformData.codeforces.username]: Invalid or missing 'platformData.codeforces.username'" });
         } else {
             try {
-                if ( await userDBInteractions.findByEmail(req.body.email) ) {
+                const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
+                const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
+                if (foundByEmail) {
                     return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
-                } else if ( await userDBInteractions.findByUsername(req.body.username) ) {
+                } else if (foundByUsername) {
                     return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that username already exists"});
                 }
                 else {
@@ -81,9 +83,9 @@ const userController = {
                 else {
                     const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
                     const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
-                    if ( foundByEmail && !(foundByEmail._id.equals(user._id)) ) {
+                    if (foundByEmail && !(foundByEmail._id.equals(user._id))) {
                         return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
-                    } else if ( foundByUsername && !(foundByUsername._id.equals(user._id)) ) {
+                    } else if (foundByUsername && !(foundByUsername._id.equals(user._id))) {
                         return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that username already exists" });
                     }
                     const updatedUserBody: IUser = {

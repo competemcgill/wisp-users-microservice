@@ -15,7 +15,7 @@ export const userDBInteractions = {
         return User.findOne({ _id: userId }).select(option).exec();
     },
 
-    findByUsername: (username: string, option: string = "-password"): Promise<IUserModel> =>{
+    findByUsername: (username: string, option: string = "-password"): Promise<IUserModel> => {
         return User.findOne({ username: username }).select(option).exec();
     },
 
