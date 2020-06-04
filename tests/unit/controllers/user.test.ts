@@ -185,23 +185,23 @@ describe("Users controller tests", () => {
             sinon.assert.calledWith(mockRes.json, tmp);
         });
 
-        it("status 400: returns an appropriate response if user with email already exists", async () => {
+        it("status 409: returns an appropriate response if user with email already exists", async () => {
             stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByEmail.returns(testUser);
             await userController.create(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
-            sinon.assert.calledWith(mockRes.status, statusCodes.BAD_REQUEST);
-            sinon.assert.calledWith(mockRes.json, { status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
+            sinon.assert.calledWith(mockRes.status, statusCodes.CONFLICT_FOUND);
+            sinon.assert.calledWith(mockRes.json, { status: statusCodes.CONFLICT_FOUND, message: "User with that email already exists" });
         });
 
-        it("status 400: returns an appropriate response if user with username already exists", async () => {
+        it("status 409: returns an appropriate response if user with username already exists", async () => {
             stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.findByUsername.returns(testUser)
             await userController.create(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
             sinon.assert.calledOnce(stubs.userDB.findByUsername);
-            sinon.assert.calledWith(mockRes.status, statusCodes.BAD_REQUEST);
-            sinon.assert.calledWith(mockRes.json, { status: statusCodes.BAD_REQUEST, message: "User with that username already exists" });
+            sinon.assert.calledWith(mockRes.status, statusCodes.CONFLICT_FOUND);
+            sinon.assert.calledWith(mockRes.json, { status: statusCodes.CONFLICT_FOUND, message: "User with that username already exists" });
         });
 
         it("status 422: returns an appropriate response with validation errors", async () => {
@@ -321,18 +321,18 @@ describe("Users controller tests", () => {
             sinon.assert.calledWith(mockRes.json, { status: statusCodes.NOT_FOUND, message: "User not found" });
         });
 
-        it("status 400: returns an appropriate response if user with new email exists", async () => {
+        it("status 409: returns an appropriate response if user with new email exists", async () => {
             stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.findByEmail.returns(testUser2);
             await userController.update(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
-            sinon.assert.calledWith(mockRes.status, statusCodes.BAD_REQUEST);
-            sinon.assert.calledWith(mockRes.json, { status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
+            sinon.assert.calledWith(mockRes.status, statusCodes.CONFLICT_FOUND);
+            sinon.assert.calledWith(mockRes.json, { status: statusCodes.CONFLICT_FOUND, message: "User with that email already exists" });
         });
 
-        it("status 400: returns an appropriate response if user with new username exists", async () => {
+        it("status 409: returns an appropriate response if user with new username exists", async () => {
             stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.findByUsername.returns(testUser2);
@@ -340,8 +340,8 @@ describe("Users controller tests", () => {
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
             sinon.assert.calledOnce(stubs.userDB.findByUsername);
-            sinon.assert.calledWith(mockRes.status, statusCodes.BAD_REQUEST);
-            sinon.assert.calledWith(mockRes.json, { status: statusCodes.BAD_REQUEST, message: "User with that username already exists" });
+            sinon.assert.calledWith(mockRes.status, statusCodes.CONFLICT_FOUND);
+            sinon.assert.calledWith(mockRes.json, { status: statusCodes.CONFLICT_FOUND, message: "User with that username already exists" });
         });
 
         it("status 422: returns an appropriate response with validation errors", async () => {

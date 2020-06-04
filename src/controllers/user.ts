@@ -50,9 +50,9 @@ const userController = {
                 const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
                 const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
                 if (foundByEmail) {
-                    return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
+                    return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that email already exists" });
                 } else if (foundByUsername) {
-                    return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that username already exists"});
+                    return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that username already exists"});
                 }
                 else {
                     const userData: IUser = {
@@ -84,9 +84,9 @@ const userController = {
                     const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
                     const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
                     if (foundByEmail && !(foundByEmail._id.equals(user._id))) {
-                        return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
+                        return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that email already exists" });
                     } else if (foundByUsername && !(foundByUsername._id.equals(user._id))) {
-                        return res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User with that username already exists" });
+                        return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that username already exists" });
                     }
                     const updatedUserBody: IUser = {
                         ...req.body,
