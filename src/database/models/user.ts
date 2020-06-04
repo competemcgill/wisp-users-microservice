@@ -10,7 +10,10 @@ const problemSchema: Schema = new Schema({
 }, { _id: false });
 
 const userSchema: Schema = new Schema({
-    username: String,
+    username: {
+        type: String,
+        unique: true,
+    },
     email: {
         type: String,
         unique: true,
@@ -50,6 +53,12 @@ const userSchema: Schema = new Schema({
 
 userSchema.index({
     email: 1,
+}, {
+    unique: true,
+});
+
+userSchema.index({
+    username: 1,
 }, {
     unique: true,
 });

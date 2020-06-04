@@ -45,8 +45,13 @@ const userController = {
             res.status(statusCodes.MISSING_PARAMS).json(errors.formatWith(errorMessage).array()[0]);
         } else {
             try {
-                const foundUser: IUserModel = await userDBInteractions.findByEmail(req.body.email);
-                if (foundUser) res.status(statusCodes.BAD_REQUEST).json({ status: statusCodes.BAD_REQUEST, message: "User already exists" });
+                const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
+                const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
+                if (foundByEmail) {
+                    return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that email already exists" });
+                } else if (foundByUsername) {
+                    return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that username already exists"});
+                }
                 else {
                     const userData: IUser = {
                         ...req.body,
@@ -75,10 +80,16 @@ const userController = {
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
+                    const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
+                    const foundByUsername = await userDBInteractions.findByUsername(req.body.username);
+                    if (foundByEmail && !(foundByEmail._id.equals(user._id))) {
+                        return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that email already exists" });
+                    } else if (foundByUsername && !(foundByUsername._id.equals(user._id))) {
+                        return res.status(statusCodes.CONFLICT_FOUND).json({ status: statusCodes.CONFLICT_FOUND, message: "User with that username already exists" });
+                    }
                     const updatedUserBody: IUser = {
                         ...req.body,
                     };
-
                     updatedUserBody.role = "USER";
                     if (req.body.password) updatedUserBody["password"] = bcryptPassword.generateHash(req.body.password);
 
