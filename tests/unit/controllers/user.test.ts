@@ -275,6 +275,26 @@ describe("Users controller tests", () => {
             sinon.assert.calledWith(mockRes.json, updatedUser);
         });
 
+        it("status 200: returns updated user with multiple fields updated", async () => {
+            const updatedUser = JSON.parse(JSON.stringify(testUser));
+            updatedUser.info.major = "Software Engineering";
+            req.body.info.major = "Software Engineering";
+            updatedUser.info.year = "U4";
+            req.body.info.year = "U4";
+            stubs.userValidator.validationResult.returns(emptyValidationError());
+            stubs.userDB.find.returns(testUser);
+            stubs.userDB.findByUsername.returns(testUser);
+            stubs.userDB.update.returns(updatedUser);
+            await userController.update(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledOnce(stubs.userDB.findByEmail);
+            sinon.assert.calledOnce(stubs.userDB.findByUsername);
+            sinon.assert.calledOnce(stubs.userDB.update);
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+            sinon.assert.calledWith(mockRes.json, updatedUser);
+        });
+
         it("status 200: returns updated user with same email", async () => {
             const updatedUser = JSON.parse(JSON.stringify(testUser));
             updatedUser.info.major = "Software Engineering";
@@ -301,7 +321,7 @@ describe("Users controller tests", () => {
             sinon.assert.calledWith(mockRes.json, { status: statusCodes.NOT_FOUND, message: "User not found" });
         });
 
-        it("status 404: returns an appropriate response if user with new email exists", async () => {
+        it("status 400: returns an appropriate response if user with new email exists", async () => {
             stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.findByEmail.returns(testUser2);
@@ -312,7 +332,7 @@ describe("Users controller tests", () => {
             sinon.assert.calledWith(mockRes.json, { status: statusCodes.BAD_REQUEST, message: "User with that email already exists" });
         });
 
-        it("status 404: returns an appropriate response if user with new username exists", async () => {
+        it("status 400: returns an appropriate response if user with new username exists", async () => {
             stubs.userValidator.validationResult.returns(emptyValidationError());
             stubs.userDB.find.returns(testUser);
             stubs.userDB.findByUsername.returns(testUser2);
