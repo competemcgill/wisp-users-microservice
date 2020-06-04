@@ -1,5 +1,5 @@
 import { body, param, ValidationChain } from "express-validator/check";
-import { validUsername, validPassword } from "./userCustom";
+import { validUsername, validPassword, hasCodeforcesUserData, hasCodeforcesUsername } from "./userCustom";
 
 export function userValidator(method: string): ValidationChain[] {
     switch (method) {
@@ -8,24 +8,38 @@ export function userValidator(method: string): ValidationChain[] {
         }
         case "GET /users/:userId": {
             return [
-                param("userId", "Invalid or missing ':userId'").exists().isMongoId()
+                param("userId", "Invalid ':userId'").isMongoId()
             ];
         }
         case "POST /users": {
             return [
-                body("username", "Invalid or missing 'username'").exists().isString(),
+                body("username", "Missing 'username'").exists(),
                 body("username", "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'")
+                    .isString()
                     .custom(validUsername),
-                body("email", "Invalid or missing 'email'").exists().isEmail(),
-                body("password", "Invalid or missing 'password'").exists().isString(),
+                body("email", "Missing 'email'").exists(),
+                body("email", "Invalid 'email'").isEmail(),
+                body("password", "Missing 'password'").exists(),
                 body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
-                    .custom(validPassword)
+                    .isString()
+                    .custom(validPassword),
+                body("platformData", "Missing 'platformData'").exists(),
+                body("platformData", "Missing 'platformData.codeforces'").custom(hasCodeforcesUserData),
+                body("platformData", "Missing 'platformData.codeforces.username").custom(hasCodeforcesUsername)
             ];
         }
         case "PUT /users/:userId": {
             return [
-                param("userId", "Invalid or missing ':userId'").exists().isString(),
-                body("email", "Invalid 'email'").optional().isEmail(),
+                param("userId", "Invalid ':userId'").isString(),
+                body("username", "Missing 'username'").exists(),
+                body("username", "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'")
+                    .isString()
+                    .custom(validUsername),
+                body("email", "Missing 'email'").exists(),
+                body("email", "Invalid 'email'").isEmail(),
+                body("platformData", "Missing 'platformData'").exists(),
+                body("platformData", "Missing 'platformData.codeforces'").custom(hasCodeforcesUserData),
+                body("platformData", "Missing 'platformData.codeforces.user").custom(hasCodeforcesUsername),
                 body("password", "Invalid 'password'").optional().isString(),
                 body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
                     .custom(validPassword)
@@ -33,21 +47,25 @@ export function userValidator(method: string): ValidationChain[] {
         }
         case "PATCH /users/:userId/problems": {
             return [
-                param("userId", "Invalid or missing ':userId'").exists().isMongoId(),
-                body("problemId", "Invalid or missing 'problemId'").exists().isString(),
-                body("isComplete", "Invalid or missing 'isComplete'").exists().isBoolean(),
-                body("status", "Invalid or missing 'status'").exists().isString()
+                param("userId", "Invalid ':userId'").isMongoId(),
+                body("problemId", "Missing 'problemId'").exists(),
+                body("problemId", "Invalid 'problemId'").isString(),
+                body("isComplete", "Missing 'isComplete'").exists(),
+                body("isComplete", "Invalid 'isComplete'").isBoolean(),
+                body("status", "Missing 'status'").exists(),
+                body("status", "Invalid 'status'").isString()
             ];
         }
         case "PATCH /users/:userId/problemSets": {
             return [
-                param("userId", "Invalid or missing ':userId'").exists().isMongoId(),
-                body("problemSetId", "Invalid or missing 'problemId'").exists().isMongoId()
+                param("userId", "Invalid ':userId'").isMongoId(),
+                body("problemSetId", "Missing 'problemId'").exists(),
+                body("problemSetId", "Invalid 'problemId'").isMongoId()
             ];
         }
         case "DELETE /users/:userId": {
             return [
-                param("userId", "Invalid or missing ':userId'").exists().isMongoId()
+                param("userId", "Invalid ':userId'").isMongoId()
             ];
         }
     }

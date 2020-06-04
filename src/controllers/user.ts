@@ -30,7 +30,7 @@ const userController = {
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 else {
-                    if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);
+                    await codeforces.updateUserProblems(user);
                     user ? res.status(statusCodes.SUCCESS).json(user) : res.status(statusCodes.NOT_FOUND).json({ status: statusCodes.NOT_FOUND, message: "User not found" });
                 }
             } catch (error) {
@@ -43,8 +43,6 @@ const userController = {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(statusCodes.MISSING_PARAMS).json(errors.formatWith(errorMessage).array()[0]);
-        } else if (!req.body.platformData || !req.body.platformData.codeforces || !req.body.platformData.codeforces.username) {
-            res.status(statusCodes.MISSING_PARAMS).json({ status: statusCodes.MISSING_PARAMS, message: "body[platformData.codeforces.username]: Invalid or missing 'platformData.codeforces.username'" });
         } else {
             try {
                 const foundByEmail = await userDBInteractions.findByEmail(req.body.email);
@@ -59,6 +57,7 @@ const userController = {
                         ...req.body,
                         password: bcryptPassword.generateHash(req.body.password)
                     };
+                    userData.role = "USER";
                     let newUser: IUserModel = await userDBInteractions.create(new User(userData));
                     newUser = newUser.toJSON();
                     delete newUser.password;
@@ -91,6 +90,7 @@ const userController = {
                     const updatedUserBody: IUser = {
                         ...req.body,
                     };
+                    updatedUserBody.role = "USER";
                     if (req.body.password) updatedUserBody["password"] = bcryptPassword.generateHash(req.body.password);
 
                     const updatedUser: IUserModel = await userDBInteractions.update(userId, updatedUserBody);
