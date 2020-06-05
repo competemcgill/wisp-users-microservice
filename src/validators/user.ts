@@ -1,5 +1,10 @@
 import { body, param, ValidationChain } from "express-validator/check";
-import { validUsername, validPassword, hasCodeforcesUserData, hasCodeforcesUsername } from "./userCustom";
+import {
+    validUsername,
+    validPassword,
+    hasCodeforcesUserData,
+    hasCodeforcesUsername
+} from "./userCustom";
 
 export function userValidator(method: string): ValidationChain[] {
     switch (method) {
@@ -7,42 +12,63 @@ export function userValidator(method: string): ValidationChain[] {
             return [];
         }
         case "GET /users/:userId": {
-            return [
-                param("userId", "Invalid ':userId'").isMongoId()
-            ];
+            return [param("userId", "Invalid ':userId'").isMongoId()];
         }
         case "POST /users": {
             return [
                 body("username", "Missing 'username'").exists(),
-                body("username", "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'")
+                body(
+                    "username",
+                    "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'"
+                )
                     .isString()
                     .custom(validUsername),
                 body("email", "Missing 'email'").exists(),
                 body("email", "Invalid 'email'").isEmail(),
                 body("password", "Missing 'password'").exists(),
-                body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
+                body(
+                    "password",
+                    "'password' must be at least 6 characters long, and cannot contain spaces"
+                )
                     .isString()
                     .custom(validPassword),
                 body("platformData", "Missing 'platformData'").exists(),
-                body("platformData", "Missing 'platformData.codeforces'").custom(hasCodeforcesUserData),
-                body("platformData", "Missing 'platformData.codeforces.username").custom(hasCodeforcesUsername)
+                body(
+                    "platformData",
+                    "Missing 'platformData.codeforces'"
+                ).custom(hasCodeforcesUserData),
+                body(
+                    "platformData",
+                    "Missing 'platformData.codeforces.username"
+                ).custom(hasCodeforcesUsername)
             ];
         }
         case "PUT /users/:userId": {
             return [
                 param("userId", "Invalid ':userId'").isString(),
                 body("username", "Missing 'username'").exists(),
-                body("username", "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'")
+                body(
+                    "username",
+                    "'username' must be alphanumeric, and the only allowed characters are '_' '-' '.'"
+                )
                     .isString()
                     .custom(validUsername),
                 body("email", "Missing 'email'").exists(),
                 body("email", "Invalid 'email'").isEmail(),
                 body("platformData", "Missing 'platformData'").exists(),
-                body("platformData", "Missing 'platformData.codeforces'").custom(hasCodeforcesUserData),
-                body("platformData", "Missing 'platformData.codeforces.user").custom(hasCodeforcesUsername),
+                body(
+                    "platformData",
+                    "Missing 'platformData.codeforces'"
+                ).custom(hasCodeforcesUserData),
+                body(
+                    "platformData",
+                    "Missing 'platformData.codeforces.user"
+                ).custom(hasCodeforcesUsername),
                 body("password", "Invalid 'password'").optional().isString(),
-                body("password", "'password' must be at least 6 characters long, and cannot contain spaces")
-                    .custom(validPassword)
+                body(
+                    "password",
+                    "'password' must be at least 6 characters long, and cannot contain spaces"
+                ).custom(validPassword)
             ];
         }
         case "PATCH /users/:userId/problems": {
@@ -64,9 +90,7 @@ export function userValidator(method: string): ValidationChain[] {
             ];
         }
         case "DELETE /users/:userId": {
-            return [
-                param("userId", "Invalid ':userId'").isMongoId()
-            ];
+            return [param("userId", "Invalid ':userId'").isMongoId()];
         }
     }
 }

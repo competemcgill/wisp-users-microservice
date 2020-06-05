@@ -3,13 +3,19 @@ export const validUsername = (username: string): boolean => {
 };
 
 export const validPassword = (password: string): boolean => {
-    return password ? (password.length > 5) && (password.indexOf(" ") === -1) : true;
+    return password
+        ? password.length > 5 && password.indexOf(" ") === -1
+        : true;
 };
 
-export const hasCodeforcesUserData = (platformData: Object): boolean => {
+export const hasCodeforcesUserData = (
+    platformData: Record<string, unknown>
+): boolean => {
     return platformData.hasOwnProperty("codeforces");
-}
+};
 
-export const hasCodeforcesUsername = (platformData: Object): boolean => {
+export const hasCodeforcesUsername = (
+    platformData: Record<string, unknown>
+): boolean => {
     return platformData["codeforces"].hasOwnProperty("username");
-}
+};
