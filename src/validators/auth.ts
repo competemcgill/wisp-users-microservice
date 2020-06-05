@@ -7,13 +7,11 @@ export function authValidator(method: string): ValidationChain[] {
                 body("email", "Missing 'email'").exists(),
                 body("email", "Invalid 'email'").isEmail(),
                 body("password", "Missing 'password'").exists(),
-                body("password", "Invalid 'password'").isString(),
+                body("password", "Invalid 'password'").isString()
             ];
         }
         case "POST /auth/introspect": {
-            return [
-                query("token", "Missing 'token'").exists()
-            ];
+            return [query("token", "Missing 'token'").exists()];
         }
     }
 }

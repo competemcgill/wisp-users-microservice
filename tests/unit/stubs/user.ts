@@ -38,7 +38,7 @@ export const userValidatorStubs = () => {
 export const userUtilStubs = () => {
     return {
         codeforces: {
-            updateUserProblems: sinon.stub(codeforces, "updateUserProblems"),
+            updateUserProblems: sinon.stub(codeforces, "updateUserProblems")
         },
 
         restore() {
