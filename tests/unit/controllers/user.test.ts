@@ -86,7 +86,7 @@ describe("Users controller tests", () => {
 
     describe("Index", () => {
         it("status 200: returns a list of a single user", async () => {
-                stubs.userDB.all.returns([testUser]);
+            stubs.userDB.all.returns([testUser]);
             await userController.index(mockReq, mockRes);
             sinon.assert.calledOnce(stubs.userDB.all);
             sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
