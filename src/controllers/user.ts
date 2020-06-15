@@ -228,18 +228,11 @@ const userController = {
     },
 
     resetLastSubmissions: async (req: Request, res: Response) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            res.status(statusCodes.MISSING_PARAMS).json(
-                errors.formatWith(errorMessage).array()[0]
-            );
-        } else {
-            try {
-                await userDBInteractions.resetLastSubmissions();
-                res.status(statusCodes.SUCCESS).json();
-            } catch (error) {
-                res.status(statusCodes.SERVER_ERROR).json(error);
-            }
+        try {
+            await userDBInteractions.resetLastSubmissions();
+            res.status(statusCodes.SUCCESS).json();
+        } catch (error) {
+            res.status(statusCodes.SERVER_ERROR).json(error);
         }
     },
 
