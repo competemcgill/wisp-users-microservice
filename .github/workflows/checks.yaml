@@ -19,5 +19,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: wget https://raw.githubusercontent.com/Compete-McGill/wisp/master/e2e/docker-compose.yaml > docker-compose.e2e.yaml
+      - run: wget https://raw.githubusercontent.com/Compete-McGill/wisp/master/e2e/docker-compose.yaml -O docker-compose.e2e.yaml
       - run: docker-compose -f docker-compose.e2e.yaml up --abort-on-container-exit
