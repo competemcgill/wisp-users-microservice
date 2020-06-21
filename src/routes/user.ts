@@ -20,6 +20,8 @@ userRouter.put(
     userController.update
 );
 
+userRouter.patch("/resetLastSubmissions", userController.resetLastSubmissions);
+
 userRouter.patch(
     "/:userId/problems",
     userValidator("PATCH /users/:userId/problems"),

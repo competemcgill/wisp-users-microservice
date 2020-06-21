@@ -227,6 +227,15 @@ const userController = {
         }
     },
 
+    resetLastSubmissions: async (req: Request, res: Response) => {
+        try {
+            await userDBInteractions.resetLastSubmissions();
+            res.status(statusCodes.SUCCESS).json();
+        } catch (error) {
+            res.status(statusCodes.SERVER_ERROR).json(error);
+        }
+    },
+
     delete: async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

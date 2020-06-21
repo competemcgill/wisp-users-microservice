@@ -109,6 +109,21 @@ describe("Users controller tests", () => {
         });
     });
 
+    describe("ResetLastSubmission", () => {
+        it("status 200: resets last submissions", async () => {
+            await userController.resetLastSubmissions(mockReq, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.resetLastSubmissions);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+            sinon.assert.calledOnce(mockRes.json);
+        });
+
+        it("status 500: fails to reset last submissions", async () => {
+            stubs.userDB.resetLastSubmissions.throws();
+            await userController.resetLastSubmissions(mockReq, mockRes);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
+        });
+    });
+
     describe("Show", () => {
         let req;
         beforeEach(() => {
