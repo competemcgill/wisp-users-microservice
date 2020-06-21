@@ -6,8 +6,6 @@ const userRouter: Router = Router();
 
 userRouter.get("/", userValidator("GET /users"), userController.index);
 
-userRouter.get("/resetLastSubmissions", userController.resetLastSubmissions);
-
 userRouter.get(
     "/:userId",
     userValidator("GET /users/:userId"),
@@ -21,6 +19,8 @@ userRouter.put(
     userValidator("PUT /users/:userId"),
     userController.update
 );
+
+userRouter.patch("/resetLastSubmissions", userController.resetLastSubmissions);
 
 userRouter.patch(
     "/:userId/problems",
