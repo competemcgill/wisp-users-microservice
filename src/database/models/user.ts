@@ -32,28 +32,53 @@ const userSchema: Schema = new Schema(
             default: "USER"
         },
         info: {
-            major: String,
-            year: String,
-            school: String,
-            bio: String,
-            profilePhoto: String
+            major: {
+                type: String,
+                default: ""
+            },
+            year: {
+                type: String,
+                default: ""
+            },
+            school: {
+                type: String,
+                default: ""
+            },
+            bio: {
+                type: String,
+                default: ""
+            },
+            profilePhoto: {
+                type: String,
+                default: ""
+            }
         },
         problems: [problemSchema],
         problemSets: [String],
         platformData: {
             codeforces: {
-                username: String,
-                email: String,
+                username: {
+                    type: String,
+                    default: ""
+                },
+                email: {
+                    type: String,
+                    default: ""
+                },
                 lastSubmission: {
-                    problemId: String,
-                    isComplete: Boolean,
-                    status: String
+                    type: {
+                        problemId: String,
+                        isComplete: Boolean,
+                        status: String
+                    },
+                    default: {}
                 }
             }
         }
     },
     {
-        timestamps: true
+        timestamps: true,
+        minimize: false
     }
 );
 
