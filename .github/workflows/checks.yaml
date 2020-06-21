@@ -3,6 +3,7 @@ name: Lint, Test
 on: [push, pull_request]
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
   lint:
@@ -24,5 +25,3 @@ jobs:
       - run: wget https://raw.githubusercontent.com/Compete-McGill/wisp/master/e2e/docker-compose.yaml -O docker-compose.e2e.yaml
       - run: docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
       - run: docker-compose -f docker-compose.e2e.yaml up --abort-on-container-exit
-      env:
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
