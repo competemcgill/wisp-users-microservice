@@ -67,7 +67,7 @@ jobs:
     # Deploy to GKE cluster using helm
     - name: Deploy
       run: |-
-        helm upgrade --install dev-users ./chart/wisp-users/ --namespace dev --set image.tag=dev-$(echo ${GITHUB_SHA} | cut -c1-8)
+        helm upgrade --atomic --install dev-users ./chart/wisp-users/ --namespace dev --set image.tag=dev-$(echo ${GITHUB_SHA} | cut -c1-8)
 
   e2e:
     needs: setup-build-tag-publish-deploy
