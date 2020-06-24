@@ -26,9 +26,3 @@ resources:
   requests:
     cpu: 50m
     memory: 100Mi
-
-labels:
-  app: wisp-users
-
-selectorLabels:
-  app: wisp-users
