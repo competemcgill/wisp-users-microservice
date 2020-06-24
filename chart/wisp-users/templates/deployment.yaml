@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wisp-users.fullname" . }}
+  labels:
+    {{- include "wisp-users.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "wisp-users.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "wisp-users.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: "DB_URL"
+              valueFrom:
+                secretKeyRef:
+                  key: "DB_URL"
+                  name: "db-secrets"
+            - name: "SECRET"
+              valueFrom:
+                secretKeyRef:
+                  key: "SECRET"
+                  name: "user-secrets"
+            - name: "WISP_PROBLEMS_URL"
+              valueFrom:
+                configMapKeyRef:
+                  name: "users-configmap"
+                  key: "WISP_PROBLEMS_URL"
