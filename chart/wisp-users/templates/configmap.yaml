@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: users-configmap
+  name: {{ include "wisp-users.fullname" . }}-configmap
 data:
   WISP_PROBLEMS_URL: http://wisp-problems
