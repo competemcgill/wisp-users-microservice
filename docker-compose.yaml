@@ -9,6 +9,7 @@ services:
       - NODE_ENV=dev
       - SECRET=Ks10daK3g
       - WISP_PROBLEMS_URL=http://problems-api:3000
+      - DB_URL=mongodb://mongo:27017/wisp
     working_dir: /app
     command: npm run start:local
     ports:

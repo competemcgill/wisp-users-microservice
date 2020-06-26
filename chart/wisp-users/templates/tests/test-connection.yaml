@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "wisp-users.fullname" . }}-test-connection"
+  labels:
+    {{- include "wisp-users.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "wisp-users.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
