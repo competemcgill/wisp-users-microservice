@@ -68,15 +68,24 @@ const authController = {
         } else {
             try {
                 const { token, uri, method } = req.query;
-                if (!token || !uri || !method) {
+                if (!uri || !method) {
                     res.status(statusCodes.UNAUTHORIZED).json({
                         status: statusCodes.UNAUTHORIZED,
                         message: "Unauthorized",
                         active: false
                     });
+                    return;
                 }
 
                 const { route, id } = auth.parseUri(decodeURI(uri));
+                if (!route) {
+                    res.status(statusCodes.NOT_FOUND).send({
+                        status: statusCodes.NOT_FOUND,
+                        message: "Invalid route"
+                    });
+                    return;
+                }
+
                 const payload = jwt.verify(token, process.env.SECRET);
                 const isAuthorized = auth.authorize(
                     route,
@@ -85,8 +94,6 @@ const authController = {
                     payload["id"],
                     id
                 );
-
-                console.log("\n\n", isAuthorized);
 
                 if (isAuthorized) {
                     res.status(statusCodes.SUCCESS).json({

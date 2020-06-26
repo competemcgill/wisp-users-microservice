@@ -1,3 +1,12 @@
+/**
+ * NOTES:
+ * - Possible scopes: INTERNAL, PUBLIC, ADMIN, and USER
+ * - Base paths and routes should be all LOWERCASE
+ * - We only support routes of the following formats for the time being:
+ *      - /resource
+ *      - /resource/{id}
+ *      - /resource/{id}/action
+ */
 export const basePaths = ["users", "auth"];
 
 export const authConfig = {
@@ -25,10 +34,22 @@ export const authConfig = {
             userProtected: true
         }
     },
-    "/users/resetLastSubmissions": {
+    "/users/resetlastsubmissions": {
         patch: {
-            scope: "ADMIN",
+            scope: "INTERNAL",
             userProtected: false
+        }
+    },
+    "/users/{id}/problems": {
+        patch: {
+            scope: "USER",
+            userProtected: true
+        }
+    },
+    "/users/{id}/problemsets": {
+        patch: {
+            scope: "USER",
+            userProtected: true
         }
     },
     "/auth/introspect": {
