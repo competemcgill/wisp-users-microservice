@@ -81,7 +81,8 @@ const authController = {
                 if (!route) {
                     res.status(statusCodes.NOT_FOUND).send({
                         status: statusCodes.NOT_FOUND,
-                        message: "Invalid route"
+                        message: "Invalid route",
+                        active: false
                     });
                     return;
                 }
