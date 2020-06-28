@@ -68,14 +68,6 @@ const authController = {
         } else {
             try {
                 const { token, uri, method } = req.query;
-                if (!uri || !method) {
-                    res.status(statusCodes.UNAUTHORIZED).json({
-                        status: statusCodes.UNAUTHORIZED,
-                        message: "Unauthorized",
-                        active: false
-                    });
-                    return;
-                }
 
                 const { route, resourceUserId } = auth.parseUri(decodeURI(uri));
                 if (!route) {
