@@ -77,7 +77,7 @@ const authController = {
                     return;
                 }
 
-                const { route, id } = auth.parseUri(decodeURI(uri));
+                const { route, resourceUserId } = auth.parseUri(decodeURI(uri));
                 if (!route) {
                     res.status(statusCodes.NOT_FOUND).send({
                         status: statusCodes.NOT_FOUND,
@@ -93,7 +93,7 @@ const authController = {
                     method.toLowerCase(),
                     payload["role"],
                     payload["id"],
-                    id
+                    resourceUserId
                 );
 
                 if (isAuthorized) {

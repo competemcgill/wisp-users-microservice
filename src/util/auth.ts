@@ -1,7 +1,7 @@
 import { authConfig, basePaths } from "../config/auth";
 
 export const auth = {
-    parseUri: (uri: string): { route: string; id: string } => {
+    parseUri: (uri: string): { route: string; resourceUserId: string } => {
         // load list of routes
         const routes: string[] = Object.keys(authConfig);
         // remove query params
@@ -12,7 +12,7 @@ export const auth = {
         // check if there is a route matching the uri
         // (saves time if the route doesn't have route params)
         if (routes.includes(uri.toLowerCase()))
-            return { route: uri.toLowerCase(), id: "" };
+            return { route: uri.toLowerCase(), resourceUserId: "" };
         else {
             // split uri and remove 1st empty position
             const uriSlice = uri.split("/");
@@ -29,13 +29,14 @@ export const auth = {
             const basePath = uriSlice[0];
 
             // if basepath doesn't exist, then route doesn't exist
-            if (!basePaths.includes(basePath)) return { route: "", id: "" };
+            if (!basePaths.includes(basePath))
+                return { route: "", resourceUserId: "" };
             else {
                 // remove the id variable to something consistent
                 if (id) uriSlice[1] = "{id}";
                 return {
                     route: "/" + uriSlice.join("/"),
-                    id: id ? id : ""
+                    resourceUserId: id
                 };
             }
         }
@@ -48,45 +49,40 @@ export const auth = {
         requestUserId: string,
         resourceUserId: string
     ): boolean => {
-        if (authConfig[route] && authConfig[route][method]) {
-            const routeConfig = authConfig[route][method];
-
-            switch (routeConfig.scope) {
-                case "INTERNAL":
-                    // reject right away since internal requests won't pass by the
-                    // introspection route
-                    return false;
-                case "PUBLIC":
-                    // accept right away since public requests won't pass by the
-                    // introspection route
-                    return true;
-                case "ADMIN":
-                    // check if role is admin
-                    return role === "ADMIN";
-                case "USER":
-                    // check if role is user or higher
-                    const authorizedInUserScope =
-                        role === "ADMIN" || role === "USER";
-
-                    if (routeConfig.userProtected) {
-                        // verify that the correct user is modifying the resource
-                        if (
-                            resourceUserId &&
-                            requestUserId === resourceUserId &&
-                            authorizedInUserScope
-                        )
-                            return true;
-                        else return false;
-                    }
-
-                    return authorizedInUserScope;
-                default:
-                    return false;
-            }
-        }
-
         // default to rejection
         // i.e. all unregistered routes are internal by default
-        return false;
+        if (!(authConfig[route] && authConfig[route][method])) return false;
+
+        const routeConfig = authConfig[route][method];
+
+        switch (routeConfig.scope) {
+            case "INTERNAL":
+                // reject right away since internal requests won't pass by the
+                // introspection route
+                return false;
+            case "PUBLIC":
+                // accept right away since public requests won't pass by the
+                // introspection route
+                return true;
+            case "ADMIN":
+                // check if role is admin
+                return role === "ADMIN";
+            case "USER":
+                // check if role is user or higher
+                const authorizedInUserScope =
+                    role === "ADMIN" || role === "USER";
+
+                if (routeConfig.userProtected) {
+                    return (
+                        resourceUserId &&
+                        requestUserId === resourceUserId &&
+                        authorizedInUserScope
+                    );
+                }
+
+                return authorizedInUserScope;
+            default:
+                return false;
+        }
     }
 };
