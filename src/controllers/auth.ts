@@ -7,6 +7,7 @@ import { IUserModel } from "../database/models/user";
 import { bcryptPassword } from "../config/bcrypt";
 import { statusCodes } from "../config/statusCodes";
 import { codeforces } from "../util/codeforces";
+import { auth } from "../util/auth";
 
 const authController = {
     login: async (req: Request, res: Response) => {
@@ -66,12 +67,39 @@ const authController = {
             );
         } else {
             try {
-                const { token } = req.query;
+                const { token, uri, method } = req.query;
+
+                const { route, resourceUserId } = auth.parseUri(decodeURI(uri));
+                if (!route) {
+                    res.status(statusCodes.NOT_FOUND).json({
+                        status: statusCodes.NOT_FOUND,
+                        message: "Invalid route",
+                        active: false
+                    });
+                    return;
+                }
+
                 const payload = jwt.verify(token, process.env.SECRET);
-                res.status(statusCodes.SUCCESS).json({
-                    active: true,
-                    user: payload
-                });
+                const isAuthorized = auth.authorize(
+                    route,
+                    method.toLowerCase(),
+                    payload["role"],
+                    payload["id"],
+                    resourceUserId
+                );
+
+                if (isAuthorized) {
+                    res.status(statusCodes.SUCCESS).json({
+                        active: true,
+                        user: payload
+                    });
+                } else {
+                    res.status(statusCodes.FORBIDDEN).json({
+                        status: statusCodes.FORBIDDEN,
+                        message: "Forbidden",
+                        active: false
+                    });
+                }
             } catch (error) {
                 res.status(statusCodes.UNAUTHORIZED).json({
                     status: statusCodes.UNAUTHORIZED,
