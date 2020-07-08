@@ -65,7 +65,55 @@ export const authConfig = {
         }
     },
     "/problems": {
+        get: {
+            scope: "USER",
+            userProtected: false
+        },
         post: {
+            scope: "ADMIN",
+            userProtected: false
+        }
+    },
+    "/problems/{id}": {
+        get: {
+            scope: "USER",
+            userProtected: false
+        },
+        put: {
+            scope: "ADMIN",
+            userProtected: false
+        },
+        delete: {
+            scope: "ADMIN",
+            userProtected: false
+        }
+    },
+    "/problems/{id}/exists": {
+        get: {
+            scope: "INTERNAL",
+            userProtected: false
+        }
+    },
+    "/problemsets": {
+        get: {
+            scope: "USER",
+            userProtected: false
+        },
+        post: {
+            scope: "ADMIN",
+            userProtected: false
+        }
+    },
+    "/problemsets/{id}": {
+        get: {
+            scope: "USER",
+            userProtected: false
+        },
+        put: {
+            scope: "ADMIN",
+            userProtected: false
+        },
+        delete: {
             scope: "ADMIN",
             userProtected: false
         }
