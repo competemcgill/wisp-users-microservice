@@ -93,7 +93,7 @@ describe("Auth util", () => {
             expect(isAuthorized).to.be.false;
         });
 
-        it("Regects all access to internal routes", () => {
+        it("Rejects all access to internal routes", () => {
             for (const role of roles) {
                 const isAuthorized = auth.authorize(
                     "/users/resetlastsubmissions",
@@ -107,7 +107,7 @@ describe("Auth util", () => {
             }
         });
 
-        it("Regects all access by default", () => {
+        it("Rejects all access by default", () => {
             for (const role of roles) {
                 const isAuthorized = auth.authorize(
                     "/test",
@@ -123,8 +123,73 @@ describe("Auth util", () => {
     });
 
     describe("ParseUri", () => {
-        it("Returns true", () => {
-            // TODO
+        it("Correctly parses uri with a valid basepath and without route or query params", () => {
+            const routes = ["/users", "/problems", "/auth", "/problemSets"];
+
+            for (const r of routes) {
+                const { route, resourceUserId } = auth.parseUri(r);
+
+                expect(route).to.equal(r.toLowerCase());
+                expect(resourceUserId).to.equal("");
+            }
+        });
+
+        it("Correctly parses uri with a valid basepath and route params", () => {
+            const { route, resourceUserId } = auth.parseUri(
+                `/users/${userId1}`
+            );
+
+            expect(route).to.equal("/users/{id}");
+            expect(resourceUserId).to.equal(userId1);
+        });
+
+        it("Correctly parses uri with a valid basepath and query params", () => {
+            const { route, resourceUserId } = auth.parseUri(
+                "/users?key1=value1&key2=value2"
+            );
+
+            expect(route).to.equal("/users");
+            expect(resourceUserId).to.equal("");
+        });
+
+        it("Correctly parses uri with a valid basepath, route params, and query params", () => {
+            const { route, resourceUserId } = auth.parseUri(
+                `/users/${userId1}?key1=value1&key2=value2`
+            );
+
+            expect(route).to.equal("/users/{id}");
+            expect(resourceUserId).to.equal(userId1);
+        });
+
+        it("Correctly parses the same route with different case", () => {
+            const routes = [
+                "/users/resetLastSubmissions",
+                "/users/resetlastsubmissions",
+                "/UsErs/ResetLAsTsuBmissIOns"
+            ];
+
+            for (const r of routes) {
+                const { route, resourceUserId } = auth.parseUri(r);
+
+                expect(route).to.equal("/users/resetlastsubmissions");
+                expect(resourceUserId).to.equal("");
+            }
+        });
+
+        it("Returns an empty route when parsing a uri with invalid basepath", () => {
+            const routes = [
+                "/test",
+                "/test/ajkshdkajshdjsad",
+                "/test?key=value",
+                "/test/ajkshdkajshdjsad?key=value"
+            ];
+
+            for (const r of routes) {
+                const { route, resourceUserId } = auth.parseUri(r);
+
+                expect(route).to.equal("");
+                expect(resourceUserId).to.equal("");
+            }
         });
     });
 });
