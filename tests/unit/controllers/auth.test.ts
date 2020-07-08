@@ -75,12 +75,14 @@ describe("Auth controller tests", () => {
         beforeEach(() => {
             req = mockReq({
                 query: {
-                    token: testToken
+                    token: testToken,
+                    uri: "/users",
+                    method: "GET"
                 }
             });
         });
 
-        it("status 200: returns a token with it's user", async () => {
+        it("status 200: returns a token status with it's user", async () => {
             stubs.userValidator.validationResult.returns(
                 emptyValidationError()
             );
@@ -97,6 +99,236 @@ describe("Auth controller tests", () => {
             });
         });
 
+        it("status 200: successful introspection with non-user-protected USER routes", async () => {
+            const routes = [
+                {
+                    uri: "/users",
+                    method: "GET"
+                },
+                {
+                    uri: `/users/${testUser._id}`,
+                    method: "GET"
+                }
+            ];
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: true,
+                    user: {
+                        email: testUser.email,
+                        id: `${testUser._id}`,
+                        role: testUser.role,
+                        iat: testTokenIat
+                    }
+                });
+            }
+        });
+
+        it("status 200: successful introspection with user-protected USER routes", async () => {
+            const routes = [
+                {
+                    uri: `/users/${testUser._id}`,
+                    method: "PUT"
+                },
+                {
+                    uri: `/users/${testUser._id}`,
+                    method: "POST"
+                },
+                {
+                    uri: `/users/${testUser._id}/problems`,
+                    method: "PATCH"
+                },
+                {
+                    uri: `/users/${testUser._id}/problemSets`,
+                    method: "PATCH"
+                }
+            ];
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: true,
+                    user: {
+                        email: testUser.email,
+                        id: `${testUser._id}`,
+                        role: testUser.role,
+                        iat: testTokenIat
+                    }
+                });
+            }
+        });
+
+        it("status 200: successful introspection with ADMIN routes", async () => {
+            const routes = [
+                {
+                    uri: "/problems",
+                    method: "POST"
+                }
+            ];
+            const token = jwt.sign(
+                { id: testUser._id, email: testUser.email, role: "ADMIN" },
+                process.env.SECRET
+            );
+            const tokenIat = Math.trunc(Date.now() / 1000);
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+                req.query.token = token;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: true,
+                    user: {
+                        email: testUser.email,
+                        id: `${testUser._id}`,
+                        role: "ADMIN",
+                        iat: tokenIat
+                    }
+                });
+            }
+        });
+
+        it("status 200: successful introspection with PUBLIC routes", async () => {
+            const routes = [
+                {
+                    uri: "/users",
+                    method: "POST"
+                },
+                {
+                    uri: "/auth/login",
+                    method: "POST"
+                }
+            ];
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: true,
+                    user: {
+                        email: testUser.email,
+                        id: `${testUser._id}`,
+                        role: testUser.role,
+                        iat: testTokenIat
+                    }
+                });
+            }
+        });
+
+        it("status 401: returns unauthorized if invalid token is sent", async () => {
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            req.query.token = "not a token";
+            await authController.introspect(req, mockRes);
+            sinon.assert.calledWith(mockRes.status, statusCodes.UNAUTHORIZED);
+        });
+
+        it("status 403: forbidden introspection with INTERNAL routes", async () => {
+            const routes = [
+                {
+                    uri: "/users/resetlastsubmissions",
+                    method: "PATCH"
+                },
+                {
+                    uri: "/auth/introspect",
+                    method: "POST"
+                }
+            ];
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.FORBIDDEN);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: false,
+                    status: statusCodes.FORBIDDEN,
+                    message: "Forbidden"
+                });
+            }
+        });
+
+        it("status 403: forbidden introspection with USER permissions on ADMIN routes", async () => {
+            const routes = [
+                {
+                    uri: "/problems",
+                    method: "POST"
+                }
+            ];
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.FORBIDDEN);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: false,
+                    status: statusCodes.FORBIDDEN,
+                    message: "Forbidden"
+                });
+            }
+        });
+
+        it("status 404: failed when giving invalid route", async () => {
+            const routes = [
+                {
+                    uri: "/test",
+                    method: "GET"
+                }
+            ];
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+
+            for (const route of routes) {
+                req.query.uri = route.uri;
+                req.query.method = route.method;
+
+                await authController.introspect(req, mockRes);
+                sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
+                sinon.assert.calledWith(mockRes.json, {
+                    active: false,
+                    status: statusCodes.NOT_FOUND,
+                    message: "Invalid route"
+                });
+            }
+        });
+
         it("status 422: returns an appropriate response with validation errors", async () => {
             const errorMsg = {
                 status: statusCodes.MISSING_PARAMS,
@@ -110,15 +342,6 @@ describe("Auth controller tests", () => {
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
             sinon.assert.calledWith(mockRes.json, errorMsg);
-        });
-
-        it("status 401: returns unauthorized if invalid token is sent", async () => {
-            stubs.userValidator.validationResult.returns(
-                emptyValidationError()
-            );
-            req.query.token = "not a token";
-            await authController.introspect(req, mockRes);
-            sinon.assert.calledWith(mockRes.status, statusCodes.UNAUTHORIZED);
         });
     });
 

@@ -7,7 +7,7 @@
  *      - /resource/{id}
  *      - /resource/{id}/action
  */
-export const basePaths = ["users", "auth"];
+export const basePaths = ["users", "auth", "problems", "problemsets"];
 
 export const authConfig = {
     "/users": {
@@ -61,6 +61,12 @@ export const authConfig = {
     "/auth/login": {
         post: {
             scope: "PUBLIC",
+            userProtected: false
+        }
+    },
+    "/problems": {
+        post: {
+            scope: "ADMIN",
             userProtected: false
         }
     }

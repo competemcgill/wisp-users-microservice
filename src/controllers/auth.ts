@@ -71,7 +71,7 @@ const authController = {
 
                 const { route, resourceUserId } = auth.parseUri(decodeURI(uri));
                 if (!route) {
-                    res.status(statusCodes.NOT_FOUND).send({
+                    res.status(statusCodes.NOT_FOUND).json({
                         status: statusCodes.NOT_FOUND,
                         message: "Invalid route",
                         active: false
