@@ -227,6 +227,35 @@ const userController = {
         }
     },
 
+    resetLastSubmission: async (req: Request, res: Response) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(statusCodes.MISSING_PARAMS).json(
+                errors.formatWith(errorMessage).array()[0]
+            );
+        } else {
+            try {
+                const { userId } = req.params;
+                await userDBInteractions.resetLastSubmission(userId);
+                const user: IUserModel = await userDBInteractions.find(userId);
+                if (!user)
+                    res.status(statusCodes.NOT_FOUND).json({
+                        status: statusCodes.NOT_FOUND,
+                        message: "User not found"
+                    });
+                else {
+                    const updatedUser: IUserModel = await userDBInteractions.update(
+                        userId,
+                        user
+                    );
+                    res.status(statusCodes.SUCCESS).json(updatedUser);
+                }
+            } catch (error) {
+                res.status(statusCodes.SERVER_ERROR).json(error);
+            }
+        }
+    },
+
     resetLastSubmissions: async (req: Request, res: Response) => {
         try {
             await userDBInteractions.resetLastSubmissions();

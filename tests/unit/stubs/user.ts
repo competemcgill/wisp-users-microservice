@@ -12,6 +12,10 @@ export const userDBInteractionsStubs = () => {
         findByUsername: sinon.stub(userDBInteractions, "findByUsername"),
         update: sinon.stub(userDBInteractions, "update"),
         delete: sinon.stub(userDBInteractions, "delete"),
+        resetLastSubmission: sinon.stub(
+            userDBInteractions,
+            "resetLastSubmission"
+        ),
         resetLastSubmissions: sinon.stub(
             userDBInteractions,
             "resetLastSubmissions"
@@ -25,6 +29,7 @@ export const userDBInteractionsStubs = () => {
             this.findByUsername.restore();
             this.update.restore();
             this.delete.restore();
+            this.resetLastSubmission.restore();
             this.resetLastSubmissions.restore();
         }
     };
