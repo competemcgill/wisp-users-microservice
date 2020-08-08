@@ -132,7 +132,6 @@ describe("Users controller tests", () => {
             stubs.userDB.find.returns(testUser);
             stubs.userDB.update.returns(updatedUser);
             await userController.resetLastSubmission(req, mockRes);
-            sinon.assert.calledOnce(stubs.userDB.resetLastSubmission);
             sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledOnce(stubs.userDB.update);
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
@@ -145,7 +144,7 @@ describe("Users controller tests", () => {
                 emptyValidationError()
             );
             await userController.resetLastSubmission(req, mockRes);
-            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledOnce(stubs.userDB.find);
             sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
             sinon.assert.calledWith(mockRes.json, {
                 status: statusCodes.NOT_FOUND,
@@ -172,7 +171,8 @@ describe("Users controller tests", () => {
             stubs.userValidator.validationResult.returns(
                 emptyValidationError()
             );
-            stubs.userDB.resetLastSubmission.throws();
+            stubs.userDB.find.returns(testUser);
+            stubs.userDB.update.throws();
             await userController.resetLastSubmission(req, mockRes);
             sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
         });

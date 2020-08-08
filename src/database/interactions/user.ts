@@ -33,15 +33,6 @@ export const userDBInteractions = {
         return User.findByIdAndDelete(userId).exec();
     },
 
-    resetLastSubmission: (userId: string): Promise<IUserModel> => {
-        return User.updateOne(
-            { _id: userId },
-            {
-                $set: { "platformData.codeforces.lastSubmission": {} }
-            }
-        ).exec();
-    },
-
     resetLastSubmissions: (): Promise<IUserModel[]> => {
         return User.updateMany(
             {},

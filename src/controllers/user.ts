@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { userDBInteractions } from "../database/interactions/user";
 import { User, IUserModel } from "../database/models/user";
 import { IUser } from "../interfaces/IUser";
+import { IProblem } from "../interfaces/IProblem";
 import { validationResult } from "express-validator/check";
 import { errorMessage } from "../config/errorFormatter";
 import { bcryptPassword } from "../config/bcrypt";
@@ -236,7 +237,6 @@ const userController = {
         } else {
             try {
                 const { userId } = req.params;
-                await userDBInteractions.resetLastSubmission(userId);
                 const user: IUserModel = await userDBInteractions.find(userId);
                 if (!user)
                     res.status(statusCodes.NOT_FOUND).json({
@@ -244,6 +244,7 @@ const userController = {
                         message: "User not found"
                     });
                 else {
+                    user.platformData.codeforces.lastSubmission = {} as IProblem;
                     const updatedUser: IUserModel = await userDBInteractions.update(
                         userId,
                         user
