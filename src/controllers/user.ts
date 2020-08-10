@@ -236,6 +236,32 @@ const userController = {
         }
     },
 
+    updateUserProblems: async (req: Request, res: Response) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(statusCodes.MISSING_PARAMS).json(
+                errors.formatWith(errorMessage).array()[0]
+            );
+        } else {
+            try {
+                const { userId } = req.params;
+                const user: IUserModel = await userDBInteractions.find(userId);
+                if (!user)
+                    res.status(statusCodes.NOT_FOUND).json({
+                        status: statusCodes.NOT_FOUND,
+                        message: "User not found"
+                    });
+                else {
+                    if (user.platformData.codeforces.username)
+                        await codeforces.updateUserProblems(user);
+                    res.status(statusCodes.SUCCESS).json(user);
+                }
+            } catch (error) {
+                res.status(statusCodes.SERVER_ERROR).json(error);
+            }
+        }
+    },
+
     delete: async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

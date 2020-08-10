@@ -6,7 +6,6 @@ import { userDBInteractions } from "../database/interactions/user";
 import { IUserModel } from "../database/models/user";
 import { bcryptPassword } from "../config/bcrypt";
 import { statusCodes } from "../config/statusCodes";
-import { codeforces } from "../util/codeforces";
 import { auth } from "../util/auth";
 
 const authController = {
@@ -35,8 +34,6 @@ const authController = {
                             message: "Invalid email or password"
                         });
                     } else {
-                        if (user.platformData.codeforces.username)
-                            await codeforces.updateUserProblems(user);
                         const token = jwt.sign(
                             {
                                 id: user._id,
