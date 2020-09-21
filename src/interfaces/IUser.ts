@@ -17,6 +17,10 @@ export interface IUser {
             lastSubmission: IProblem;
         };
     };
+    confirmation: {
+        isConfirmed: boolean;
+        confirmationCode: string;
+    }
 }
 
 export interface IInfo {

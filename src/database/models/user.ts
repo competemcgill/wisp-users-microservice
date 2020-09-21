@@ -44,6 +44,10 @@ const userSchema: Schema = new Schema({
             },
         },
     },
+    confirmation: {
+        isConfirmed: Boolean,
+        confirmationCode: String
+    }
 }, {
     timestamps: true,
 });

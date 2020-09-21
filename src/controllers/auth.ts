@@ -21,7 +21,9 @@ const authController = {
                 if (!user) {
                     res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                 } else {
-                    if (!bcryptPassword.validate(password, user.password)) {
+                    if (!user.confirmation.isConfirmed) {
+                        res.status(statusCodes.UNAUTHORIZED).send({ status: statusCodes.UNAUTHORIZED, message: "Please confirm your email address before logging in (check the email linked to your account)." })
+                    } else if (!bcryptPassword.validate(password, user.password)) {
                         res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid email or password" });
                     } else {
                         if (user.platformData.codeforces.username) await codeforces.updateUserProblems(user);

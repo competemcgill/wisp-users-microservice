@@ -52,12 +52,44 @@ const userController = {
                 else {
                     const userData: IUser = {
                         ...req.body,
+                        confirmation: {
+                            isConfirmed: false,
+                            confirmationCode: bcryptPassword.generateHash(Math.random().toString())
+                        },
                         password: bcryptPassword.generateHash(req.body.password)
                     };
                     let newUser: IUserModel = await userDBInteractions.create(new User(userData));
                     newUser = newUser.toJSON();
                     delete newUser.password;
                     res.status(statusCodes.SUCCESS).send(newUser);
+                }
+            } catch (error) {
+                res.status(statusCodes.SERVER_ERROR).send(error);
+            }
+        }
+    },
+
+    // TODO: write validators
+    // path: /users/:userId/confirmEmail/:confirmationCode
+    confirmEmail: async (req: Request, res: Response) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(statusCodes.MISSING_PARAMS).json(errors.formatWith(errorMessage).array()[0]);
+        } else {
+            try {
+                const { userId, confirmationCode } = req.params;
+                const user: IUserModel = await userDBInteractions.find(userId);
+                if (!user)
+                    res.status(statusCodes.NOT_FOUND).send({ status: statusCodes.NOT_FOUND, message: "User not found" });
+                else if (user.confirmation.isConfirmed) {
+                    res.status(statusCodes.SUCCESS).send({ status: statusCodes.SUCCESS, message: "Your account is already confirmed! You have access to WISP" });
+                } else if (user.confirmation.confirmationCode === confirmationCode) {
+                    const newUser = { ...user }
+                    newUser.confirmation.isConfirmed = true;
+                    await userDBInteractions.update(userId, newUser);
+                    res.status(statusCodes.SUCCESS).send({ status: statusCodes.SUCCESS, message: "Your account is now confirmed! You are now able to log into https://wisp.training" })
+                } else {
+                    res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid confirmation code" })
                 }
             } catch (error) {
                 res.status(statusCodes.SERVER_ERROR).send(error);
