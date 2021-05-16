@@ -32,7 +32,12 @@ const testUser: IUserModel = new User({
     platformData: {
         codeforces: {
             username: "test",
-            email: "test@gmail.com"
+            email: "test@gmail.com",
+            lastSubmission: {
+                problemId: "6e0d9ca7d2e93b127f941e1566b6253aa48dab48",
+                isComplete: "true",
+                status: "OK"
+            }
         }
     },
     _id: "5ed7505cf09e10001e5084b7"
@@ -110,6 +115,70 @@ describe("Users controller tests", () => {
     });
 
     describe("ResetLastSubmission", () => {
+        let req;
+        beforeEach(() => {
+            req = mockReq({
+                params: {
+                    userId: testUser._id
+                }
+            });
+        });
+        it("status 200: resets last submission", async () => {
+            const updatedUser = JSON.parse(JSON.stringify(testUser));
+            updatedUser.platformData.codeforces.lastSubmission = {};
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            stubs.userDB.find.returns(testUser);
+            stubs.userDB.update.returns(updatedUser);
+            await userController.resetLastSubmission(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledOnce(stubs.userDB.update);
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+            sinon.assert.calledWith(mockRes.json, updatedUser);
+        });
+
+        it("status 404: returns an appropriate response if user with given id doesn't exist", async () => {
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            await userController.resetLastSubmission(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
+            sinon.assert.calledWith(mockRes.json, {
+                status: statusCodes.NOT_FOUND,
+                message: "User not found"
+            });
+        });
+
+        it("status 422: returns an appropriate response with validation error", async () => {
+            const errorMsg = {
+                status: statusCodes.MISSING_PARAMS,
+                message: "params[userId]: Invalid or missing ':userId'"
+            };
+            req.params.userId = "not ObjectId";
+            stubs.userValidator.validationResult.returns(
+                validationErrorWithMessage(errorMsg)
+            );
+            await userController.resetLastSubmission(req, mockRes);
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
+            sinon.assert.calledWith(mockRes.json, errorMsg);
+        });
+
+        it("status 500: fails to reset last submission", async () => {
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            stubs.userDB.find.returns(testUser);
+            stubs.userDB.update.throws();
+            await userController.resetLastSubmission(req, mockRes);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
+        });
+    });
+
+    describe("ResetLastSubmissions", () => {
         it("status 200: resets last submissions", async () => {
             await userController.resetLastSubmissions(mockReq, mockRes);
             sinon.assert.calledOnce(stubs.userDB.resetLastSubmissions);
