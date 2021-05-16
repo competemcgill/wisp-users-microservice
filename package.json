@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Compete-McGill/wisp-users-microservice.git"
+    "url": "git+https://github.com/competemcgill/wisp-users-microservice.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Compete-McGill/wisp-users-microservice/issues"
+    "url": "https://github.com/competemcgill/wisp-users-microservice/issues"
   },
-  "homepage": "https://github.com/Compete-McGill/wisp-users-microservice#readme",
+  "homepage": "https://github.com/competemcgill/wisp-users-microservice#readme",
   "dependencies": {
     "@babel/core": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
