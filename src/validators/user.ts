@@ -11,6 +11,12 @@ export function userValidator(method: string): ValidationChain[] {
                 param("userId", "Invalid or missing ':userId'").exists().isMongoId()
             ];
         }
+        case "GET /users/:userId/confirmEmail/:confirmationCode": {
+            return [
+                param("userId", "Invalid or missing ':userId'").exists().isMongoId(),
+                param("confirmationCode", "Invalid or missing ':confirmationCode'").exists().isString()
+            ];
+        }
         case "POST /users": {
             return [
                 body("username", "Invalid or missing 'username'").exists().isString(),

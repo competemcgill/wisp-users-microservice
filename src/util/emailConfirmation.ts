@@ -15,7 +15,7 @@ export async function sendConfirmationEmail(user: IUserModel) {
         please click the link below. If you didn't sign up for an
         account on WISP recently, then ignore this email.</div>
         <br />
-        <a href="https://wisp.training/users/${user._id}/confirmEmail${user.confirmation.confirmationCode}" target="_blank"><button>Confirm Email</button></a>
+        <a href="https://api.wisp.training/users/${user._id}/confirmEmail/${user.confirmation.confirmationCode}" target="_blank"><button>Confirm Email</button></a>
         `
     };
     try {

@@ -8,6 +8,8 @@ userRouter.get("/", userValidator("GET /users"), userController.index);
 
 userRouter.get("/:userId", userValidator("GET /users/:userId"), userController.show);
 
+userRouter.get("/:userId/confirmEmail/:confirmationCode", userValidator("GET /users/:userId/confirmEmail/:confirmationCode"), userController.confirmEmail);
+
 userRouter.post("/", userValidator("POST /users"), userController.create);
 
 userRouter.put("/:userId", userValidator("PUT /users/:userId"), userController.update);

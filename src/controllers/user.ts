@@ -7,6 +7,7 @@ import { errorMessage } from "../config/errorFormatter";
 import { bcryptPassword } from "../config/bcrypt";
 import { statusCodes } from "../config/statusCodes";
 import { codeforces } from "../util/codeforces";
+import { sendConfirmationEmail } from "../util/emailConfirmation";
 
 const userController = {
 
@@ -59,6 +60,7 @@ const userController = {
                         password: bcryptPassword.generateHash(req.body.password)
                     };
                     let newUser: IUserModel = await userDBInteractions.create(new User(userData));
+                    await sendConfirmationEmail(newUser);
                     newUser = newUser.toJSON();
                     delete newUser.password;
                     res.status(statusCodes.SUCCESS).send(newUser);
@@ -69,8 +71,6 @@ const userController = {
         }
     },
 
-    // TODO: write validators
-    // path: /users/:userId/confirmEmail/:confirmationCode
     confirmEmail: async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -84,9 +84,7 @@ const userController = {
                 else if (user.confirmation.isConfirmed) {
                     res.status(statusCodes.SUCCESS).send({ status: statusCodes.SUCCESS, message: "Your account is already confirmed! You have access to WISP" });
                 } else if (user.confirmation.confirmationCode === confirmationCode) {
-                    const newUser = { ...user }
-                    newUser.confirmation.isConfirmed = true;
-                    await userDBInteractions.update(userId, newUser);
+                    user.save()
                     res.status(statusCodes.SUCCESS).send({ status: statusCodes.SUCCESS, message: "Your account is now confirmed! You are now able to log into https://wisp.training" })
                 } else {
                     res.status(statusCodes.BAD_REQUEST).send({ status: statusCodes.BAD_REQUEST, message: "Invalid confirmation code" })
