@@ -365,9 +365,6 @@ describe("Auth controller tests", () => {
             stubs.jwt.sign.returns(testToken);
             await authController.login(req, mockRes);
             sinon.assert.calledOnce(stubs.userDB.findByEmail);
-            sinon.assert.calledOnce(
-                stubs.userUtil.codeforces.updateUserProblems
-            );
             sinon.assert.calledOnce(stubs.userValidator.validationResult);
             sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
             const tmp = testUser.toJSON();
