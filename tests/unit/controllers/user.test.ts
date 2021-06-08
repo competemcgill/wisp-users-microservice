@@ -124,6 +124,70 @@ describe("Users controller tests", () => {
         });
     });
 
+    describe("UpdateUserProblems", () => {
+        let req;
+        beforeEach(() => {
+            req = mockReq({
+                params: {
+                    userId: testUser._id
+                }
+            });
+        });
+        it("status 200: updates user problems", async () => {
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            stubs.userDB.find.returns(testUser);
+            stubs.userUtil.codeforces.updateUserProblems.returns();
+            await userController.updateUserProblems(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledOnce(
+                stubs.userUtil.codeforces.updateUserProblems
+            );
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SUCCESS);
+            sinon.assert.calledWith(mockRes.json, testUser);
+        });
+
+        it("status 404: returns an appropriate response if user with given id doesn't exist", async () => {
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            await userController.updateUserProblems(req, mockRes);
+            sinon.assert.calledOnce(stubs.userDB.find);
+            sinon.assert.calledWith(mockRes.status, statusCodes.NOT_FOUND);
+            sinon.assert.calledWith(mockRes.json, {
+                status: statusCodes.NOT_FOUND,
+                message: "User not found"
+            });
+        });
+
+        it("status 422: returns an appropriate response with validation error", async () => {
+            const errorMsg = {
+                status: statusCodes.MISSING_PARAMS,
+                message: "params[userId]: Invalid or missing ':userId'"
+            };
+            req.params.userId = "not ObjectId";
+            stubs.userValidator.validationResult.returns(
+                validationErrorWithMessage(errorMsg)
+            );
+            await userController.updateUserProblems(req, mockRes);
+            sinon.assert.calledOnce(stubs.userValidator.validationResult);
+            sinon.assert.calledWith(mockRes.status, statusCodes.MISSING_PARAMS);
+            sinon.assert.calledWith(mockRes.json, errorMsg);
+        });
+
+        it("status 500: fails to update user problems", async () => {
+            stubs.userValidator.validationResult.returns(
+                emptyValidationError()
+            );
+            stubs.userDB.find.returns(testUser);
+            stubs.userUtil.codeforces.updateUserProblems.throws();
+            await userController.updateUserProblems(req, mockRes);
+            sinon.assert.calledWith(mockRes.status, statusCodes.SERVER_ERROR);
+        });
+    });
+
     describe("Show", () => {
         let req;
         beforeEach(() => {

@@ -71,6 +71,9 @@ export function userValidator(method: string): ValidationChain[] {
                 ).custom(validPassword)
             ];
         }
+        case "PATCH /users/:userId/updateUserProblems": {
+            return [param("userId", "Invalid ':userId'").isMongoId()];
+        }
         case "PATCH /users/:userId/problems": {
             return [
                 param("userId", "Invalid ':userId'").isMongoId(),
